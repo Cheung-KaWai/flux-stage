@@ -1,13 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls";
-import { createTable } from "./table";
+import { createTable, allTextures } from "./table";
 
 let dimensions = {
   width: window.innerWidth / 2,
   height: window.innerHeight,
 };
 
-let canvas, camera, scene, controls, renderer, table;
+let canvas, camera, light, scene, controls, renderer, table, material;
+const inputFields = Array.from(
+  document.querySelectorAll(".configuration-size-inputField")
+);
 
 // create basic scene
 function init() {
@@ -27,15 +30,17 @@ function init() {
   controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
 
+  light = new THREE.AmbientLight("#fff");
+
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  scene.add(camera);
+  scene.add(camera, light);
 
-  // basic cube
-  table = createTable();
-  table.scale.set(1.5, 0.05, 0.5);
+  // basic table
+  material = new THREE.MeshStandardMaterial(allTextures.wood);
+  table = createTable("rect", material);
   scene.add(table);
 
   window.addEventListener("resize", onWindowResize);
@@ -66,21 +71,44 @@ function animate() {
 
 init();
 
-//change cube input change
-const lengthInput = document.querySelector("#length-input");
-lengthInput.addEventListener("change", (event) => {
-  const length = event.target.value;
-  table.scale.x = length / 100;
+//change table size
+const size = document.querySelector(".configuration-size");
+size.addEventListener("change", (event) => {
+  const orientation = event.target.dataset.orientation;
+  table.scale[orientation] = event.target.value / 100;
 });
 
-const widthInput = document.querySelector("#width-input");
-widthInput.addEventListener("change", (event) => {
-  const width = event.target.value;
-  table.scale.z = width / 100;
+// change shape and show relevent inputfield size
+const shape = document.querySelector(".configuration-shape");
+shape.addEventListener("click", (event) => {
+  const objectShape = event.target.dataset.shape;
+  if (objectShape) {
+    scene.remove(table);
+    table = createTable(objectShape, material);
+    scene.add(table);
+
+    // show revelant inputfield
+    inputFields.map((input) => {
+      if (input.dataset.type.includes(objectShape)) {
+        input.classList.remove("hide");
+      } else {
+        input.classList.add("hide");
+      }
+    });
+  }
 });
 
-const heightInput = document.querySelector("#height-input");
-heightInput.addEventListener("change", (event) => {
-  const height = event.target.value;
-  table.scale.y = height / 100;
+//change texture material
+const textures = document.querySelector(".configuration-texture");
+textures.addEventListener("click", (event) => {
+  const data = event.target.dataset.texture;
+  if (data) {
+    const mapTexture = allTextures[data].map;
+    mapTexture.repeat.x = 2;
+    mapTexture.repeat.y = 2;
+    mapTexture.wrapS = THREE.RepeatWrapping;
+    mapTexture.wrapT = THREE.RepeatWrapping;
+    table.material.map = mapTexture;
+    table.material.needsUpdate = true;
+  }
 });

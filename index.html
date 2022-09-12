@@ -11,19 +11,73 @@
     <canvas id="canvas"></canvas>
 
     <div class="configuration-container">
-      <div class="configuration-inputField">
-        <label for="length">Length (cm)</label>
-        <input type="text" name="length" id="length-input" value="150" />
+      <div class="configuration-size">
+        <div class="configuration-size-inputField" data-type="rect">
+          <label for="length">Length (cm)</label>
+          <input
+            type="text"
+            name="length"
+            id="length-input"
+            value="150"
+            data-orientation="x"
+          />
+        </div>
+
+        <div class="configuration-size-inputField" data-type="rect">
+          <label for="width">Width (cm)</label>
+          <input
+            type="text"
+            name="width"
+            id="width-input"
+            value="50"
+            data-orientation="z"
+          />
+        </div>
+
+        <div class="configuration-size-inputField" data-type="rect circle">
+          <label for="Height">height (cm)</label>
+          <input
+            type="text"
+            name="height"
+            id="height-input"
+            value="5"
+            data-orientation="y"
+          />
+        </div>
+
+        <div class="configuration-size-inputField hide" data-type="circle">
+          <label for="diameter">diameter (cm)</label>
+          <input
+            type="text"
+            name="diameter"
+            id="diameter-input"
+            value="5"
+            data-orientation="y"
+          />
+        </div>
       </div>
-      <div class="configuration-inputField">
-        <label for="width">Width (cm)</label>
-        <input type="text" name="width" id="width-input" value="50" />
+
+      <div class="configuration-shape">
+        <button data-shape="rect">Rectangle</button>
+        <button data-shape="circle">Circle</button>
       </div>
-      <div class="configuration-inputField">
-        <label for="Height">height (cm)</label>
-        <input type="text" name="height" id="height-input" value="5" />
+
+      <div class="configuration-texture">
+        <img
+          src="/src/assets/table/wood/Wood_027_basecolor.jpg"
+          data-texture="wood"
+        />
+        <img
+          src="/src/assets/table/wood2/Wood_023_basecolor.jpg"
+          data-texture="wood2"
+        />
+        <img
+          src="/src/assets/table/wood3/Wood_025_basecolor.jpg"
+          data-texture="wood3"
+        />
       </div>
     </div>
+
     <script type="module" src="./src/js/three.js"></script>
   </body>
 </html>

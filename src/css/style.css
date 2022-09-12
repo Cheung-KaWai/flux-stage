@@ -14,4 +14,22 @@
   right: 0;
   width: 50vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.configuration-size {
+  display: flex;
+  flex-direction: column;
+}
+
+.hide {
+  display: none;
+}
+
+img {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
 }
