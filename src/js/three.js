@@ -1,34 +1,54 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls";
+import { createTable } from "./table";
 
 let dimensions = {
   width: window.innerWidth / 2,
   height: window.innerHeight,
 };
 
-const canvas = document.querySelector("#canvas");
+let canvas, camera, scene, controls, renderer, table;
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color("#ffffff");
+// create basic scene
+function init() {
+  canvas = document.querySelector("#canvas");
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  dimensions.width / dimensions.height,
-  0.1,
-  100
-);
-camera.position.set(0, 0.5, 3);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color("#ffffff");
 
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+  camera = new THREE.PerspectiveCamera(
+    75,
+    dimensions.width / dimensions.height,
+    0.1,
+    100
+  );
+  camera.position.set(0, 0.5, 2);
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(dimensions.width, dimensions.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
 
-scene.add(camera);
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(dimensions.width, dimensions.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  scene.add(camera);
+
+  // basic cube
+  table = createTable();
+  table.scale.set(1.5, 0.05, 0.5);
+  scene.add(table);
+
+  window.addEventListener("resize", onWindowResize);
+  animate();
+}
 
 function onWindowResize() {
+  // update dimensions
+  dimensions = {
+    width: window.innerWidth / 2,
+    height: window.innerHeight,
+  };
+
   //update camera
   camera.aspect = dimensions.width / dimensions.height;
   camera.updateProjectionMatrix();
@@ -38,18 +58,29 @@ function onWindowResize() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
-window.addEventListener("resize", onWindowResize);
-
 function animate() {
   renderer.render(scene, camera);
   controls.update();
   window.requestAnimationFrame(animate);
 }
 
-//test
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+init();
 
-animate();
+//change cube input change
+const lengthInput = document.querySelector("#length-input");
+lengthInput.addEventListener("change", (event) => {
+  const length = event.target.value;
+  table.scale.x = length / 100;
+});
+
+const widthInput = document.querySelector("#width-input");
+widthInput.addEventListener("change", (event) => {
+  const width = event.target.value;
+  table.scale.z = width / 100;
+});
+
+const heightInput = document.querySelector("#height-input");
+heightInput.addEventListener("change", (event) => {
+  const height = event.target.value;
+  table.scale.y = height / 100;
+});
