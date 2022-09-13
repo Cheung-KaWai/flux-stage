@@ -2,28 +2,6 @@ import * as THREE from "three";
 
 const textureLoader = new THREE.TextureLoader();
 
-export function createTable(shape, material) {
-  const shapeObject = {
-    circle: new THREE.CylinderGeometry(1, 1, 0.05, 64, 32),
-    rect: new THREE.BoxGeometry(1, 1, 1, 64, 64, 64),
-  };
-
-  // sizes in meters
-  const scale = {
-    rect: [1.5, 0.05, 0.5],
-    circle: [1, 1, 1],
-  };
-
-  const geometry = shapeObject[shape];
-  geometry.setAttribute(
-    "uv2",
-    new THREE.BufferAttribute(geometry.attributes.uv.array, 2)
-  );
-  const table = new THREE.Mesh(geometry, material);
-  table.scale.set(...scale[shape]);
-  return table;
-}
-
 const tableColorTextureWood = textureLoader.load(
   "/src/assets/table/wood/Wood_027_basecolor.jpg"
 );
@@ -53,7 +31,31 @@ export const allTextures = {
   wood3,
 };
 
-tableColorTextureWood.repeat.x = 3;
-tableColorTextureWood.repeat.y = 2;
-tableColorTextureWood.wrapS = THREE.RepeatWrapping;
-tableColorTextureWood.wrapT = THREE.RepeatWrapping;
+export function transformTexture(texture) {
+  texture.repeat.y = 2;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.rotation = Math.PI * 0.5;
+  return texture;
+}
+
+export function createTable(shape, material) {
+  const shapeObject = {
+    circle: new THREE.CylinderGeometry(1, 1, 1, 64, 32),
+    rect: new THREE.BoxGeometry(1, 1, 1, 64, 64, 64),
+    oval: new THREE.CylinderGeometry(1, 1, 1, 64, 32),
+  };
+
+  // sizes in meters
+  const scale = {
+    rect: [1.5, 0.05, 0.6],
+    circle: [0.5, 0.05, 0.5],
+    oval: [0.75, 0.05, 0.3],
+  };
+
+  const geometry = shapeObject[shape];
+  const table = new THREE.Mesh(geometry, material);
+  table.scale.set(...scale[shape]);
+
+  return table;
+}

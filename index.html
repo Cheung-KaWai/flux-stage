@@ -12,7 +12,7 @@
 
     <div class="configuration-container">
       <div class="configuration-size">
-        <div class="configuration-size-inputField" data-type="rect">
+        <div class="configuration-size-inputField" data-type="rect oval">
           <label for="length">Length (cm)</label>
           <input
             type="text"
@@ -23,18 +23,18 @@
           />
         </div>
 
-        <div class="configuration-size-inputField" data-type="rect">
+        <div class="configuration-size-inputField" data-type="rect oval">
           <label for="width">Width (cm)</label>
           <input
             type="text"
             name="width"
             id="width-input"
-            value="50"
+            value="80"
             data-orientation="z"
           />
         </div>
 
-        <div class="configuration-size-inputField" data-type="rect circle">
+        <div class="configuration-size-inputField" data-type="rect circle oval">
           <label for="Height">height (cm)</label>
           <input
             type="text"
@@ -51,8 +51,8 @@
             type="text"
             name="diameter"
             id="diameter-input"
-            value="5"
-            data-orientation="y"
+            value="100"
+            data-orientation="circle"
           />
         </div>
       </div>
@@ -60,6 +60,7 @@
       <div class="configuration-shape">
         <button data-shape="rect">Rectangle</button>
         <button data-shape="circle">Circle</button>
+        <button data-shape="oval">Oval</button>
       </div>
 
       <div class="configuration-texture">
@@ -78,6 +79,6 @@
       </div>
     </div>
 
-    <script type="module" src="./src/js/three.js"></script>
+    <script type="module" src="./src/js/main.js"></script>
   </body>
 </html>
