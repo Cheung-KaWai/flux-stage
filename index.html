@@ -14,68 +14,54 @@
       <div class="configuration-size">
         <div class="configuration-size-inputField" data-type="rect oval">
           <label for="length">Length (cm)</label>
-          <input
-            type="text"
-            name="length"
-            id="length-input"
-            value="150"
-            data-orientation="x"
-          />
+          <select name="length" id="length-input" data-orientation="x">
+            <option value="150">150cm</option>
+            <option value="160">160cm</option>
+            <option value="170">170cm</option>
+          </select>
+          <!-- <input type="text" name="length" id="length-input" value="150" /> -->
         </div>
 
         <div class="configuration-size-inputField" data-type="rect oval">
           <label for="width">Width (cm)</label>
-          <input
-            type="text"
-            name="width"
-            id="width-input"
-            value="80"
-            data-orientation="z"
-          />
+          <select name="width" id="width-input" data-orientation="z">
+            <option value="60">60cm</option>
+            <option value="70">70cm</option>
+            <option value="80">80cm</option>
+          </select>
         </div>
 
         <div class="configuration-size-inputField" data-type="rect circle oval">
           <label for="Height">height (cm)</label>
-          <input
-            type="text"
-            name="height"
-            id="height-input"
-            value="5"
-            data-orientation="y"
-          />
+          <select name="height" id="height-input" data-orientation="y">
+            <option value="5">5cm</option>
+            <option value="6">6cm</option>
+          </select>
         </div>
 
         <div class="configuration-size-inputField hide" data-type="circle">
           <label for="diameter">diameter (cm)</label>
-          <input
-            type="text"
-            name="diameter"
-            id="diameter-input"
-            value="100"
-            data-orientation="circle"
-          />
+          <select name="diameter" id="diameter-input" data-orientation="circle">
+            <option value="100">100cm</option>
+            <option value="110">110cm</option>
+            <option value="120">120cm</option>
+          </select>
         </div>
       </div>
 
       <div class="configuration-shape">
         <button data-shape="rect">Rectangle</button>
         <button data-shape="circle">Circle</button>
-        <button data-shape="oval">Oval</button>
       </div>
 
       <div class="configuration-texture">
-        <img
-          src="/src/assets/table/wood/Wood_027_basecolor.jpg"
-          data-texture="wood"
-        />
-        <img
-          src="/src/assets/table/wood2/Wood_023_basecolor.jpg"
-          data-texture="wood2"
-        />
-        <img
-          src="/src/assets/table/wood3/Wood_025_basecolor.jpg"
-          data-texture="wood3"
-        />
+        <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" />
+        <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" />
+      </div>
+
+      <div class="configuration-legs">
+        <button data-leg="leg1">Leg 1</button>
+        <button data-leg="leg2">Leg 2</button>
       </div>
     </div>
 

@@ -12,7 +12,7 @@
 .configuration-container {
   position: absolute;
   right: 0;
-  width: 50vw;
+  width: 25vw;
   height: 100vh;
   display: flex;
   flex-direction: column;

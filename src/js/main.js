@@ -1,29 +1,20 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls";
-import { createTable, allTextures, transformTexture } from "./table";
-import { createTableLegsRectangle } from "./legs";
+import { createTable, allTextures } from "./table";
+import { allLegs } from "./legs";
 import { Pane } from "tweakpane";
 
 let dimensions = {
-  width: window.innerWidth / 2,
+  width: window.innerWidth * 0.75,
   height: window.innerHeight,
 };
 
-let canvas,
-  camera,
-  ambientLight,
-  pointLight,
-  scene,
-  controls,
-  renderer,
-  table,
-  tableLegs,
-  material,
-  debug;
+let canvas, camera, ambientLight, cube, scene, controls, renderer, table, tableLegs, material, debug, directLight;
 
-const inputFields = Array.from(
-  document.querySelectorAll(".configuration-size-inputField")
-);
+const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
+
+const textureLoader = new THREE.TextureLoader();
+const check = textureLoader.load("/src/assets/image.png");
 
 // create basic scene
 function init() {
@@ -32,40 +23,33 @@ function init() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color("#fff");
 
-  camera = new THREE.PerspectiveCamera(
-    75,
-    dimensions.width / dimensions.height,
-    0.1,
-    100
-  );
+  camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 100);
   camera.position.set(0, 0.75, 1.5);
 
   controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
 
-  ambientLight = new THREE.AmbientLight("#fff", 1);
+  ambientLight = new THREE.AmbientLight("#fff", 0.7);
 
-  pointLight = new THREE.PointLight("#fff", 1, 100);
-  pointLight.position.set(0, 1, -1.5);
-  pointLight.rotation.x = Math.PI * 0.5;
+  // pointLight = new THREE.PointLight("#fff", 0.2, 100);
+  // pointLight.position.set(0, 1, -1.5);
+  // pointLight.rotation.x = Math.PI * 0.5;
+  directLight = new THREE.DirectionalLight("#fff", 0.4);
+  directLight.position.set(1, 3, -3.5);
+  // const directHelper = new THREE.DirectionalLightHelper(directLight, 0.5);
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   // basic table
-  material = new THREE.MeshStandardMaterial();
-  material.roughness = 0.6;
-  const mapTexture = allTextures.wood.map;
-  const transformedMapTexture = transformTexture(mapTexture);
-  material.map = transformedMapTexture;
-
+  material = new THREE.MeshStandardMaterial(allTextures.wood4);
   table = createTable("rect", material);
-  tableLegs = createTableLegsRectangle(table);
+  tableLegs = allLegs.leg1(table);
 
-  debug = new Pane();
+  // debug = new Pane();
 
-  scene.add(camera, ambientLight, table, tableLegs, pointLight);
+  scene.add(camera, ambientLight, table, tableLegs, directLight);
 
   window.addEventListener("resize", onWindowResize);
 
@@ -75,7 +59,7 @@ function init() {
 function onWindowResize() {
   // update dimensions
   dimensions = {
-    width: window.innerWidth / 2,
+    width: window.innerWidth,
     height: window.innerHeight,
   };
 
@@ -108,7 +92,7 @@ size.addEventListener("change", (event) => {
   }
 
   scene.remove(tableLegs);
-  tableLegs = createTableLegsRectangle(table);
+  tableLegs = allLegs.leg1(table);
   scene.add(tableLegs);
 });
 
@@ -119,7 +103,7 @@ shape.addEventListener("click", (event) => {
   if (objectShape) {
     scene.remove(table, tableLegs);
     table = createTable(objectShape, material);
-    tableLegs = createTableLegsRectangle(table);
+    tableLegs = allLegs.leg1(table);
     scene.add(table, tableLegs);
 
     // show revelant inputfield
@@ -138,45 +122,62 @@ const textures = document.querySelector(".configuration-texture");
 textures.addEventListener("click", (event) => {
   const data = event.target.dataset.texture;
   if (data) {
-    const mapTexture = allTextures[data].map;
-    const transformedMapTexture = transformTexture(mapTexture);
-    table.material.map = transformedMapTexture;
+    table.material = new THREE.MeshStandardMaterial(allTextures[data]);
     table.material.needsUpdate = true;
   }
 });
 
+//change types legs
+const typeLeg = document.querySelector(".configuration-legs");
+typeLeg.addEventListener("click", (event) => {
+  const data = event.target.dataset.leg;
+  if (data) {
+    const chosenLegs = allLegs[data](table);
+    scene.remove(tableLegs);
+    tableLegs = chosenLegs;
+    scene.add(tableLegs);
+  }
+});
+
 // tweak parameters
-const tableDebug = debug.addFolder({
-  title: "table",
-});
-tableDebug
-  .addInput(material, "roughness", { min: 0, max: 1, step: 0.1 })
-  .on("change", (ev) => (material.roughness = ev.value));
+// const tableDebug = debug.addFolder({
+//   title: "table",
+// });
+// tableDebug
+//   .addInput(material, "roughness", { min: 0, max: 1, step: 0.1 })
+//   .on("change", (ev) => (material.roughness = ev.value));
 
-tableDebug
-  .addInput(material, "metalness", { min: 0, max: 1, step: 0.1 })
-  .on("change", (ev) => (material.metalness = ev.value));
+// tableDebug
+//   .addInput(material, "metalness", { min: 0, max: 1, step: 0.1 })
+//   .on("change", (ev) => (material.metalness = ev.value));
 
-const legsDebug = debug.addFolder({
-  title: "legs",
-});
+// const legsDebug = debug.addFolder({
+//   title: "legs",
+// });
 
-legsDebug
-  .addInput(tableLegs.children[0].material, "metalness", {
-    min: 0,
-    max: 1,
-    step: 0.1,
-  })
-  .on("change", (ev) => {
-    tableLegs.children.map((leg) => (leg.material.metalness = ev.value));
-  });
+// legsDebug
+//   .addInput(tableLegs.children[0].material, "metalness", {
+//     min: 0,
+//     max: 1,
+//     step: 0.1,
+//   })
+//   .on("change", (ev) => {
+//     tableLegs.children.map((leg) => (leg.material.metalness = ev.value));
+//   });
 
-legsDebug
-  .addInput(tableLegs.children[0].material, "roughness", {
-    min: 0,
-    max: 1,
-    step: 0.1,
-  })
-  .on("change", (ev) => {
-    tableLegs.children.map((leg) => (leg.material.roughness = ev.value));
-  });
+// legsDebug
+//   .addInput(tableLegs.children[0].material, "roughness", {
+//     min: 0,
+//     max: 1,
+//     step: 0.1,
+//   })
+//   .on("change", (ev) => {
+//     tableLegs.children.map((leg) => (leg.material.roughness = ev.value));
+//   });
+
+// debug.addInput(check.repeat, "y", { min: 0, max: 3, step: 0.1 }).on("change", (ev) => {
+//   check.repeat.y = ev.value;
+// });
+// debug.addInput(check.repeat, "x", { min: 0, max: 3, step: 0.1 }).on("change", (ev) => {
+//   check.repeat.y = ev.value;
+// });
