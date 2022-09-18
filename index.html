@@ -8,13 +8,15 @@
     <title>Vite App</title>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
-
+    <canvas id="canvas"> </canvas>
+    <img src="/src/assets/arrow.svg" alt="arrow" id="arrow" data-toggle="show" />
     <div class="configuration-container">
+      <h1>Table Configurator</h1>
+
       <div class="configuration-size">
         <div class="configuration-size-inputField" data-type="rect oval">
           <label for="length">Length (cm)</label>
-          <select name="length" id="length-input" data-orientation="x">
+          <select name="length" id="length-input" data-orientation="x" class="select">
             <option value="150">150cm</option>
             <option value="160">160cm</option>
             <option value="170">170cm</option>
@@ -24,7 +26,7 @@
 
         <div class="configuration-size-inputField" data-type="rect oval">
           <label for="width">Width (cm)</label>
-          <select name="width" id="width-input" data-orientation="z">
+          <select name="width" id="width-input" data-orientation="z" class="select">
             <option value="60">60cm</option>
             <option value="70">70cm</option>
             <option value="80">80cm</option>
@@ -32,16 +34,16 @@
         </div>
 
         <div class="configuration-size-inputField" data-type="rect circle oval">
-          <label for="Height">height (cm)</label>
-          <select name="height" id="height-input" data-orientation="y">
+          <label for="Height">Height (cm)</label>
+          <select name="height" id="height-input" data-orientation="y" class="select">
             <option value="5">5cm</option>
             <option value="6">6cm</option>
           </select>
         </div>
 
         <div class="configuration-size-inputField hide" data-type="circle">
-          <label for="diameter">diameter (cm)</label>
-          <select name="diameter" id="diameter-input" data-orientation="circle">
+          <label for="diameter">Diameter (cm)</label>
+          <select name="diameter" id="diameter-input" data-orientation="circle" class="select">
             <option value="100">100cm</option>
             <option value="110">110cm</option>
             <option value="120">120cm</option>

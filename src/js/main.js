@@ -12,6 +12,8 @@ let dimensions = {
 let canvas, camera, ambientLight, cube, scene, controls, renderer, table, tableLegs, material, debug, directLight;
 
 const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
+const toggle = document.querySelector("#arrow");
+const resetValues = [150, 60, 5, 100];
 
 const textureLoader = new THREE.TextureLoader();
 const check = textureLoader.load("/src/assets/image.png");
@@ -58,8 +60,15 @@ function init() {
 
 function onWindowResize() {
   // update dimensions
+  let factor;
+  if (toggle.dataset.toggle === "hide") {
+    factor = 1;
+  } else {
+    factor = 0.75;
+  }
+
   dimensions = {
-    width: window.innerWidth,
+    width: window.innerWidth * factor,
     height: window.innerHeight,
   };
 
@@ -114,6 +123,11 @@ shape.addEventListener("click", (event) => {
         input.classList.add("hide");
       }
     });
+
+    // reset values
+    Array.from(document.querySelectorAll(".select")).map((input, index) => {
+      input.value = resetValues[index];
+    });
   }
 });
 
@@ -136,6 +150,21 @@ typeLeg.addEventListener("click", (event) => {
     scene.remove(tableLegs);
     tableLegs = chosenLegs;
     scene.add(tableLegs);
+  }
+});
+
+//hide configurator
+toggle.addEventListener("click", (ev) => {
+  if (ev.target.dataset.toggle === "hide") {
+    toggle.dataset.toggle = "show";
+    onWindowResize();
+    toggle.style.right = "24vw";
+    toggle.style.transform = "rotateY(0deg)";
+  } else {
+    toggle.dataset.toggle = "hide";
+    onWindowResize();
+    toggle.style.right = "0rem";
+    toggle.style.transform = "rotateY(180deg)";
   }
 });
 

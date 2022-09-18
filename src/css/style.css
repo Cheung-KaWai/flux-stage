@@ -1,6 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  overflow-x: hidden;
+  font-family: "Poppins", sans-serif;
+  color: #495057;
 }
 
 #canvas {
@@ -16,7 +29,10 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 3rem;
+  z-index: -10;
+  padding: 2rem;
+  border-left: 3px solid #495057;
 }
 
 .configuration-size {
@@ -32,4 +48,33 @@ img {
   width: 100px;
   height: 100px;
   cursor: pointer;
+}
+
+#arrow {
+  position: absolute;
+  right: 24vw;
+  top: 2.5rem;
+  z-index: 5;
+  height: 4rem;
+  stroke: #4263eb;
+}
+
+h1 {
+  color: #212529;
+}
+
+button,
+select {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+select {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+}
+option {
+  color: #212529 !important;
 }
