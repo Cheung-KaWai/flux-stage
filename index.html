@@ -9,61 +9,77 @@
   </head>
   <body>
     <canvas id="canvas"> </canvas>
+    <div class="loading-bar"></div>
     <img src="/src/assets/arrow.svg" alt="arrow" id="arrow" data-toggle="show" />
     <div class="configuration-container">
       <h1>Table Configurator</h1>
 
       <div class="configuration-size">
+        <h2>Dimensions</h2>
         <div class="configuration-size-inputField" data-type="rect oval">
-          <label for="length">Length (cm)</label>
+          <label for="length">Length</label>
           <select name="length" id="length-input" data-orientation="x" class="select">
-            <option value="150">150cm</option>
-            <option value="160">160cm</option>
-            <option value="170">170cm</option>
+            <option value="150">150 cm</option>
+            <option value="160">160 cm</option>
+            <option value="170">170 cm</option>
           </select>
           <!-- <input type="text" name="length" id="length-input" value="150" /> -->
         </div>
 
         <div class="configuration-size-inputField" data-type="rect oval">
-          <label for="width">Width (cm)</label>
+          <label for="width">Width</label>
           <select name="width" id="width-input" data-orientation="z" class="select">
-            <option value="60">60cm</option>
-            <option value="70">70cm</option>
-            <option value="80">80cm</option>
-          </select>
-        </div>
-
-        <div class="configuration-size-inputField" data-type="rect circle oval">
-          <label for="Height">Height (cm)</label>
-          <select name="height" id="height-input" data-orientation="y" class="select">
-            <option value="5">5cm</option>
-            <option value="6">6cm</option>
+            <option value="60">60 cm</option>
+            <option value="70">70 cm</option>
+            <option value="80">80 cm</option>
           </select>
         </div>
 
         <div class="configuration-size-inputField hide" data-type="circle">
-          <label for="diameter">Diameter (cm)</label>
+          <label for="diameter">Diameter</label>
           <select name="diameter" id="diameter-input" data-orientation="circle" class="select">
-            <option value="100">100cm</option>
-            <option value="110">110cm</option>
-            <option value="120">120cm</option>
+            <option value="100">100 cm</option>
+            <option value="110">110 cm</option>
+            <option value="120">120 cm</option>
+          </select>
+        </div>
+
+        <div class="configuration-size-inputField" data-type="rect circle oval">
+          <label for="Height">Height</label>
+          <select name="height" id="height-input" data-orientation="y" class="select">
+            <option value="5">5 cm</option>
+            <option value="6">6 cm</option>
           </select>
         </div>
       </div>
 
       <div class="configuration-shape">
-        <button data-shape="rect">Rectangle</button>
-        <button data-shape="circle">Circle</button>
+        <h2 class="mb-1">Shape Table</h2>
+        <div class="flex-buttons">
+          <button data-shape="rect" class="underline shape">Rectangle</button>
+          <button data-shape="circle" class="shape">Circle</button>
+        </div>
       </div>
 
       <div class="configuration-texture">
-        <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" />
-        <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" />
+        <h2 class="mb-1">Texture</h2>
+        <div class="texture-container texture-selected">
+          <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
+        </div>
+        <div class="texture-container">
+          <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" class="texture" />
+        </div>
+        <div class="texture-container">
+          <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
+        </div>
       </div>
 
       <div class="configuration-legs">
-        <button data-leg="leg1">Leg 1</button>
-        <button data-leg="leg2">Leg 2</button>
+        <h2 class="mb-1">Leg Type</h2>
+        <div class="flex-buttons">
+          <button data-leg="leg1" class="underline leg">Leg 1</button>
+          <button data-leg="leg2" class="leg">Leg 2</button>
+        </div>
       </div>
     </div>
 

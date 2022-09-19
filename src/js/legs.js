@@ -3,39 +3,9 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import legsModel from "../models/legs/legsModels.glb?url";
 
-const textureLoader = new THREE.TextureLoader();
-const cubeTextureLoader = new THREE.CubeTextureLoader();
+import { metal } from "./loading";
 
-const metalColorTexture = textureLoader.load("/src/assets/legs/Metal_006_basecolor.jpg");
-const metalRoughness = textureLoader.load("/src/assets/legs/Metal_006_roughness.jpg");
-const normalMap = textureLoader.load("/src/assets/legs/Metal_006_normal.jpg");
-const metallicMap = textureLoader.load("/src/assets/legs/Metal_006_metallic.jpg");
-
-metalColorTexture.repeat.y = 1;
-metalColorTexture.repeat.x = 0.125;
-
-metalColorTexture.wrapS = THREE.RepeatWrapping;
-metalColorTexture.wrapT = THREE.RepeatWrapping;
-
-const environmentMapTexture = cubeTextureLoader.load([
-  "/src/assets/env/px.jpg",
-  "/src/assets/env/nx.jpg",
-  "/src/assets/env/py.jpg",
-  "/src/assets/env/ny.jpg",
-  "/src/assets/env/pz.jpg",
-  "/src/assets/env/nz.jpg",
-]);
-
-const material = new THREE.MeshStandardMaterial({
-  map: metalColorTexture,
-  roughness: 1,
-  metalnessMap: metallicMap,
-  metalness: 1,
-  envMap: environmentMapTexture,
-  normalMap: normalMap,
-  roughnessMap: metalRoughness,
-});
-
+const material = new THREE.MeshStandardMaterial(metal);
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 
 export function createTableLegsRectangle(table) {
@@ -46,24 +16,33 @@ export function createTableLegsRectangle(table) {
   const group = new THREE.Group();
 
   const leg1 = new THREE.Mesh(geometry, material);
+  leg1.castShadow = true;
+  leg1.receiveShadow = false;
+
   leg1.scale.set(...dimensions);
   leg1.position.y = -dimensions[1] / 2;
   leg1.position.x = (dimensionsTable.x - dimensions[0]) / 2 - margin;
   leg1.position.z = (dimensionsTable.z - dimensions[0]) / 2 - margin;
 
   const leg2 = new THREE.Mesh(geometry, material);
+  leg2.castShadow = true;
+  leg2.receiveShadow = false;
   leg2.scale.set(...dimensions);
   leg2.position.y = -dimensions[1] / 2;
   leg2.position.x = (dimensionsTable.x - dimensions[0]) / 2 - margin;
   leg2.position.z = -(dimensionsTable.z - dimensions[0]) / 2 + margin;
 
   const leg3 = new THREE.Mesh(geometry, material);
+  leg3.castShadow = true;
+  leg3.receiveShadow = false;
   leg3.scale.set(...dimensions);
   leg3.position.y = -dimensions[1] / 2;
   leg3.position.x = -(dimensionsTable.x - dimensions[0]) / 2 + margin;
   leg3.position.z = -(dimensionsTable.z - dimensions[0]) / 2 + margin;
 
   const leg4 = new THREE.Mesh(geometry, material);
+  leg4.castShadow = true;
+  leg4.receiveShadow = false;
   leg4.scale.set(...dimensions);
   leg4.position.y = -dimensions[1] / 2;
   leg4.position.x = -(dimensionsTable.x - dimensions[0]) / 2 + margin;
@@ -82,24 +61,32 @@ export function createTableLegsRectangle2(table) {
   const group = new THREE.Group();
 
   const leg1 = new THREE.Mesh(geometry, material);
+  leg1.castShadow = true;
+  leg1.receiveShadow = false;
   leg1.scale.set(...dimensions);
   leg1.position.y = -dimensions[1] / 2;
   leg1.position.x = (dimensionsTable.x - dimensions[0]) / 2 - margin;
 
   const leg2 = new THREE.Mesh(geometry, material);
+  leg2.castShadow = true;
+  leg2.receiveShadow = false;
   leg2.scale.set(...dimensions);
   leg2.position.y = -dimensions[1] / 2;
   leg2.position.x = -(dimensionsTable.x - dimensions[0]) / 2 + margin;
 
   const leg3 = new THREE.Mesh(geometry, material);
+  leg3.castShadow = true;
+  leg3.receiveShadow = false;
   leg3.scale.set(...dimensions);
-  leg3.position.y = -dimensions[1];
+  leg3.position.y = -dimensions[1] - 0.025;
   leg3.position.x = -(dimensionsTable.x - dimensions[0]) / 2 + margin;
   leg3.rotateX(Math.PI * 0.5);
 
   const leg4 = new THREE.Mesh(geometry, material);
+  leg4.castShadow = true;
+  leg4.receiveShadow = false;
   leg4.scale.set(...dimensions);
-  leg4.position.y = -dimensions[1];
+  leg4.position.y = -dimensions[1] - 0.025;
   leg4.position.x = (dimensionsTable.x - dimensions[0]) / 2 - margin;
   leg4.rotateX(Math.PI * 0.5);
 

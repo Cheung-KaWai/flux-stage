@@ -9,14 +9,19 @@ let dimensions = {
   height: window.innerHeight,
 };
 
-let canvas, camera, ambientLight, cube, scene, controls, renderer, table, tableLegs, material, debug, directLight;
+let canvas, camera, ambientLight, scene, controls, renderer, table, tableLegs, material, debug, directLight;
 
 const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
 const toggle = document.querySelector("#arrow");
-const resetValues = [150, 60, 5, 100];
+const resetValues = [150, 60, 100, 5];
+const textureRepeat = {
+  rect: { x: 1.2, y: 0.5 },
+  circle: { x: 1, y: 1 },
+};
 
-const textureLoader = new THREE.TextureLoader();
-const check = textureLoader.load("/src/assets/image.png");
+const shapeButtons = document.querySelectorAll(".shape");
+const legButtons = document.querySelectorAll(".leg");
+const textureButtons = document.querySelectorAll(".texture-container");
 
 // create basic scene
 function init() {
@@ -31,30 +36,42 @@ function init() {
   controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
 
-  ambientLight = new THREE.AmbientLight("#fff", 0.7);
+  ambientLight = new THREE.AmbientLight("#fff", 0.8);
 
-  // pointLight = new THREE.PointLight("#fff", 0.2, 100);
-  // pointLight.position.set(0, 1, -1.5);
-  // pointLight.rotation.x = Math.PI * 0.5;
-  directLight = new THREE.DirectionalLight("#fff", 0.4);
-  directLight.position.set(1, 3, -3.5);
+  directLight = new THREE.DirectionalLight("#fff", 0.3);
+  directLight.castShadow = true;
+  directLight.position.set(1, 3, -2.5);
+  directLight.shadow.mapSize.width = 4096;
+  directLight.shadow.mapSize.height = 4096;
   // const directHelper = new THREE.DirectionalLightHelper(directLight, 0.5);
+  directLight.shadow.camera.near = 1.5;
+  directLight.shadow.camera.far = 6;
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // renderer.outputEncoding = THREE.sRGBEncoding;
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
+  // material.wireframe = true;
   table = createTable("rect", material);
+  table.geometry.setAttribute("uv2", new THREE.Float32BufferAttribute(table.geometry.attributes.uv.array, 2));
   tableLegs = allLegs.leg1(table);
 
-  // debug = new Pane();
-
-  scene.add(camera, ambientLight, table, tableLegs, directLight);
+  //floor for shadow
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(10, 10, 10),
+    new THREE.MeshStandardMaterial({ color: "#fff", roughness: 0.7 })
+  );
+  floor.receiveShadow = true;
+  floor.position.set(0, -0.55, 0);
+  floor.rotateX(-Math.PI * 0.5);
 
   window.addEventListener("resize", onWindowResize);
-
+  scene.add(camera, ambientLight, table, tableLegs, directLight, floor);
   animate();
 }
 
@@ -110,8 +127,11 @@ const shape = document.querySelector(".configuration-shape");
 shape.addEventListener("click", (event) => {
   const objectShape = event.target.dataset.shape;
   if (objectShape) {
+    material = table.material;
     scene.remove(table, tableLegs);
     table = createTable(objectShape, material);
+    table.material.map.repeat.x = textureRepeat[objectShape].x;
+    table.material.map.repeat.y = textureRepeat[objectShape].y;
     tableLegs = allLegs.leg1(table);
     scene.add(table, tableLegs);
 
@@ -128,6 +148,9 @@ shape.addEventListener("click", (event) => {
     Array.from(document.querySelectorAll(".select")).map((input, index) => {
       input.value = resetValues[index];
     });
+
+    //underline shape
+    underline(objectShape, shapeButtons);
   }
 });
 
@@ -138,6 +161,7 @@ textures.addEventListener("click", (event) => {
   if (data) {
     table.material = new THREE.MeshStandardMaterial(allTextures[data]);
     table.material.needsUpdate = true;
+    showSelectedTexture(data);
   }
 });
 
@@ -150,6 +174,8 @@ typeLeg.addEventListener("click", (event) => {
     scene.remove(tableLegs);
     tableLegs = chosenLegs;
     scene.add(tableLegs);
+
+    underline(data, legButtons);
   }
 });
 
@@ -168,45 +194,81 @@ toggle.addEventListener("click", (ev) => {
   }
 });
 
+// underline type
+function underline(param, list) {
+  Array.from(list).map((button) => {
+    if (param.includes("leg")) {
+      if (button.dataset.leg === param) {
+        button.classList.add("underline");
+      } else {
+        button.classList.remove("underline");
+      }
+    } else {
+      if (button.dataset.shape === param) {
+        button.classList.add("underline");
+      } else {
+        button.classList.remove("underline");
+      }
+    }
+  });
+}
+
+// add dot on selected texture
+function showSelectedTexture(param) {
+  Array.from(textureButtons).map((button) => {
+    if (button.children[0].dataset.texture === param) {
+      button.classList.add("texture-selected");
+    } else {
+      button.classList.remove("texture-selected");
+    }
+  });
+}
+
 // tweak parameters
-// const tableDebug = debug.addFolder({
-//   title: "table",
-// });
-// tableDebug
-//   .addInput(material, "roughness", { min: 0, max: 1, step: 0.1 })
-//   .on("change", (ev) => (material.roughness = ev.value));
+debug = new Pane();
 
-// tableDebug
-//   .addInput(material, "metalness", { min: 0, max: 1, step: 0.1 })
-//   .on("change", (ev) => (material.metalness = ev.value));
+const checkDebug = debug.addFolder({
+  title: "check",
+});
 
-// const legsDebug = debug.addFolder({
-//   title: "legs",
-// });
+checkDebug.addInput(allTextures.check.map.repeat, "y", { min: 0, max: 3, step: 0.01 }).on("change", (ev) => {
+  allTextures.check.map.repeat.y = ev.value;
+});
+checkDebug.addInput(allTextures.check.map.repeat, "x", { min: 0, max: 3, step: 0.01 }).on("change", (ev) => {
+  allTextures.check.map.repeat.x = ev.value;
+});
 
-// legsDebug
-//   .addInput(tableLegs.children[0].material, "metalness", {
-//     min: 0,
-//     max: 1,
-//     step: 0.1,
-//   })
-//   .on("change", (ev) => {
-//     tableLegs.children.map((leg) => (leg.material.metalness = ev.value));
-//   });
+const tableDebug = debug.addFolder({
+  title: "table",
+});
+tableDebug
+  .addInput(material, "roughness", { min: 0, max: 1, step: 0.1 })
+  .on("change", (ev) => (material.roughness = ev.value));
 
-// legsDebug
-//   .addInput(tableLegs.children[0].material, "roughness", {
-//     min: 0,
-//     max: 1,
-//     step: 0.1,
-//   })
-//   .on("change", (ev) => {
-//     tableLegs.children.map((leg) => (leg.material.roughness = ev.value));
-//   });
+tableDebug
+  .addInput(material, "metalness", { min: 0, max: 1, step: 0.1 })
+  .on("change", (ev) => (material.metalness = ev.value));
 
-// debug.addInput(check.repeat, "y", { min: 0, max: 3, step: 0.1 }).on("change", (ev) => {
-//   check.repeat.y = ev.value;
-// });
-// debug.addInput(check.repeat, "x", { min: 0, max: 3, step: 0.1 }).on("change", (ev) => {
-//   check.repeat.y = ev.value;
-// });
+const legsDebug = debug.addFolder({
+  title: "legs",
+});
+
+legsDebug
+  .addInput(tableLegs.children[0].material, "metalness", {
+    min: 0,
+    max: 1,
+    step: 0.1,
+  })
+  .on("change", (ev) => {
+    tableLegs.children.map((leg) => (leg.material.metalness = ev.value));
+  });
+
+legsDebug
+  .addInput(tableLegs.children[0].material, "roughness", {
+    min: 0,
+    max: 1,
+    step: 0.1,
+  })
+  .on("change", (ev) => {
+    tableLegs.children.map((leg) => (leg.material.roughness = ev.value));
+  });
