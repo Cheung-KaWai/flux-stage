@@ -9,14 +9,36 @@
   </head>
   <body>
     <canvas id="canvas"> </canvas>
+    <div class="debug"></div>
+    <div class="hide-screen"></div>
     <div class="loading-bar"></div>
+    <p class="loading-percentage">0%</p>
     <img src="/src/assets/arrow.svg" alt="arrow" id="arrow" data-toggle="show" />
     <div class="configuration-container">
       <h1>Table Configurator</h1>
 
+      <div class="configuration-shape">
+        <h2 class="mb-1"><span class="step">1</span> | Shape Table</h2>
+        <div class="flex-buttons">
+          <p class="label">Shape</p>
+          <div>
+            <button data-shape="rectangle" class="underline shape">Rectangle</button>
+            <button data-shape="circle" class="shape">Circle</button>
+          </div>
+          <p class="label">Type</p>
+          <div>
+            <button data-shape="rectangle" data-version="basicRectangle" class="underline shape-type">Sharp</button>
+            <button data-shape="rectangle" data-version="roundedRectangle" class="shape-type">Rounded</button>
+            <button data-shape="rectangle" data-version="gapRectangle" class="shape-type">Outdoor</button>
+            <button data-shape="circle" data-version="basicCircle" class="underline shape-type hide">Sharp</button>
+            <button data-shape="circle" data-version="roundedCircle" class="underline shape-type hide">rounded</button>
+          </div>
+        </div>
+      </div>
+
       <div class="configuration-size">
-        <h2>Dimensions</h2>
-        <div class="configuration-size-inputField" data-type="rect oval">
+        <h2><span class="step">2</span> | Dimensions</h2>
+        <div class="configuration-size-inputField" data-type="rectangle oval">
           <label for="length">Length</label>
           <select name="length" id="length-input" data-orientation="x" class="select">
             <option value="150">150 cm</option>
@@ -26,7 +48,7 @@
           <!-- <input type="text" name="length" id="length-input" value="150" /> -->
         </div>
 
-        <div class="configuration-size-inputField" data-type="rect oval">
+        <div class="configuration-size-inputField" data-type="rectangle oval">
           <label for="width">Width</label>
           <select name="width" id="width-input" data-orientation="z" class="select">
             <option value="60">60 cm</option>
@@ -38,47 +60,66 @@
         <div class="configuration-size-inputField hide" data-type="circle">
           <label for="diameter">Diameter</label>
           <select name="diameter" id="diameter-input" data-orientation="circle" class="select">
-            <option value="100">100 cm</option>
-            <option value="110">110 cm</option>
-            <option value="120">120 cm</option>
+            <option value="150">150 cm</option>
+            <option value="160">160 cm</option>
+            <option value="170">170 cm</option>
           </select>
         </div>
 
-        <div class="configuration-size-inputField" data-type="rect circle oval">
+        <!-- <div class="configuration-size-inputField" data-type="rectangle circle oval">
           <label for="Height">Height</label>
           <select name="height" id="height-input" data-orientation="y" class="select">
             <option value="5">5 cm</option>
             <option value="6">6 cm</option>
           </select>
-        </div>
-      </div>
-
-      <div class="configuration-shape">
-        <h2 class="mb-1">Shape Table</h2>
-        <div class="flex-buttons">
-          <button data-shape="rect" class="underline shape">Rectangle</button>
-          <button data-shape="circle" class="shape">Circle</button>
-        </div>
+        </div> -->
       </div>
 
       <div class="configuration-texture">
-        <h2 class="mb-1">Texture</h2>
+        <h2 class="mb-1"><span class="step">3</span> | Texture Table</h2>
         <div class="texture-container texture-selected">
           <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
+          <p>wood1</p>
         </div>
         <div class="texture-container">
           <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" class="texture" />
+          <p>wood2</p>
         </div>
         <div class="texture-container">
           <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
+          <p>wood3</p>
         </div>
       </div>
 
       <div class="configuration-legs">
-        <h2 class="mb-1">Leg Type</h2>
+        <h2 class="mb-1"><span class="step">4</span> | Leg Type</h2>
         <div class="flex-buttons">
-          <button data-leg="leg1" class="underline leg">Leg 1</button>
-          <button data-leg="leg2" class="leg">Leg 2</button>
+          <div>
+            <button data-leg="leg1" class="underline leg" data-type="rectangle">basic</button>
+            <button data-leg="leg2" class="leg" data-type="rectangle">cross</button>
+            <button data-leg="leg3" class="underline leg hide" data-type="circle">basic</button>
+            <button data-leg="leg4" class="leg hide" data-type="circle">Cone</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="configuration-texture-legs">
+        <h2 class="mb-1"><span class="step">5</span> | Texture Legs</h2>
+        <div class="texture-container-leg texture-selected">
+          <img src="/src/assets/legs/Metal009_1K_Color.jpg" data-texture="metal" class="texture" />
+          <p>metal</p>
+        </div>
+        <div class="texture-container-leg">
+          <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
+          <p>wood1</p>
+        </div>
+        <div class="texture-container-leg">
+          <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" class="texture" />
+          <p>wood2</p>
+        </div>
+        <div class="texture-container-leg">
+          <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
+          <p>wood3</p>
         </div>
       </div>
     </div>
