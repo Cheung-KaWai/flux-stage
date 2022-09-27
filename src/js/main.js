@@ -56,6 +56,10 @@ function init() {
   camera.position.set(0, 0.75, 1.5);
 
   controls = new OrbitControls(camera, canvas);
+  controls.enablePan = false;
+  controls.minDistance = 1.0;
+  controls.maxDistance = 3.0;
+  controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
   ambientLight = new THREE.AmbientLight("#fff", 0.8);

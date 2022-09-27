@@ -1,12 +1,10 @@
-import * as THREE from "three";
-
 import basicRectangle from "../models/tables/rectangle/basic.glb?url";
 import roundedRectangle from "../models/tables/rectangle/rounded.glb?url";
 import gapRectangle from "../models/tables/rectangle/gap.glb?url";
 import basicCircle from "../models/tables/circle/basicCircle.glb?url";
 import roundedCircle from "../models/tables/circle/roundedCircle.glb?url";
 
-import { wood2, wood3, wood4, checkTexture, metal } from "./loadTextures";
+import { wood2, wood3, wood4, wood1, checkTexture, metal } from "./loadTextures";
 
 const check = {
   map: checkTexture,
@@ -28,6 +26,7 @@ export const allTextures = {
   wood2,
   wood3,
   wood4,
+  wood1,
   check,
   metal,
 };

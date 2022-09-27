@@ -59,7 +59,7 @@ export const metal = {
   metalnessMap: metallicMap,
   metalness: 1,
   envMap: environmentMapTexture,
-  envMapIntensity: 1,
+  envMapIntensity: 0.5,
   normalMap: normalMap,
   roughnessMap: metalRoughness,
 };
@@ -72,6 +72,11 @@ const tableColorTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood0
 const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_Roughness.jpg");
 const tableNormalTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_NormalDx.jpg");
 const tableAmbientOcclusionTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_AmbientOcclusion.jpg");
+
+const tableColorTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_basecolor.jpg");
+const tableRoughnessTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_roughness.jpg");
+const tableNormalTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_normal.jpg");
+const tableAmbientOcclusionTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_ambientOcclusion.jpg");
 
 const tableColorTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood051_1K_Color.jpg");
 const tableRoughnessTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood051_1K_Roughness.jpg");
@@ -91,11 +96,24 @@ transformTexture([
   tableRoughnessTextureWood3,
   tableNormalTextureWood3,
   tableAmbientOcclusionTextureWood3,
+  tableColorTextureWood1,
+  tableRoughnessTextureWood1,
+  tableNormalTextureWood1,
+  tableAmbientOcclusionTextureWood1,
   tableColorTextureWood2,
   tableRoughnessTextureWood2,
   tableNormalTextureWood2,
   checkTexture,
 ]);
+
+export const wood1 = {
+  map: tableColorTextureWood1,
+  roughnessMap: tableRoughnessTextureWood1,
+  roughness: 1,
+  normalMap: tableNormalTextureWood1,
+  aoMap: tableAmbientOcclusionTextureWood1,
+  aoMapIntensity: 1,
+};
 
 export const wood2 = {
   map: tableColorTextureWood2,

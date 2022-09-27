@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./src/css/style.css" />
-    <title>Vite App</title>
+    <title>Table Configurator</title>
   </head>
   <body>
     <canvas id="canvas"> </canvas>
@@ -89,15 +89,19 @@
           <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
           <p>wood3</p>
         </div>
+        <div class="texture-container">
+          <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
+          <p>wood4</p>
+        </div>
       </div>
 
       <div class="configuration-legs">
         <h2 class="mb-1"><span class="step">4</span> | Leg Type</h2>
         <div class="flex-buttons">
           <div>
-            <button data-leg="leg1" class="underline leg" data-type="rectangle">basic</button>
-            <button data-leg="leg2" class="leg" data-type="rectangle">cross</button>
-            <button data-leg="leg3" class="underline leg hide" data-type="circle">basic</button>
+            <button data-leg="leg1" class="underline leg" data-type="rectangle">T-Legs</button>
+            <button data-leg="leg2" class="leg" data-type="rectangle">X-legs</button>
+            <button data-leg="leg3" class="underline leg hide" data-type="circle">Cilinder</button>
             <button data-leg="leg4" class="leg hide" data-type="circle">Cone</button>
           </div>
         </div>
@@ -120,6 +124,10 @@
         <div class="texture-container-leg">
           <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
           <p>wood3</p>
+        </div>
+        <div class="texture-container-leg">
+          <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
+          <p>wood4</p>
         </div>
       </div>
     </div>
