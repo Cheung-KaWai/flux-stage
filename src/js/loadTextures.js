@@ -68,10 +68,9 @@ const tableColorTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood0
 const tableRoughnessTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Roughness.jpg");
 const tableNormalTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_NormalDx.jpg");
 
-const tableColorTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_Color.jpg");
-const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_Roughness.jpg");
-const tableNormalTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_NormalDx.jpg");
-const tableAmbientOcclusionTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood073_1K_AmbientOcclusion.jpg");
+const tableColorTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Color.jpg");
+const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Roughness.jpg");
+const tableNormalTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_NormalDx.jpg");
 
 const tableColorTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_basecolor.jpg");
 const tableRoughnessTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_roughness.jpg");
@@ -95,7 +94,6 @@ transformTexture([
   tableColorTextureWood3,
   tableRoughnessTextureWood3,
   tableNormalTextureWood3,
-  tableAmbientOcclusionTextureWood3,
   tableColorTextureWood1,
   tableRoughnessTextureWood1,
   tableNormalTextureWood1,
@@ -127,8 +125,6 @@ export const wood3 = {
   roughnessMap: tableRoughnessTextureWood3,
   roughness: 1,
   normalMap: tableNormalTextureWood3,
-  aoMap: tableAmbientOcclusionTextureWood3,
-  aoMapIntensity: 1,
 };
 
 export const wood4 = {
@@ -140,9 +136,18 @@ export const wood4 = {
 
 function transformTexture(textures) {
   textures.map((texture) => {
-    texture.repeat.y = 0.38;
+    texture.repeat.y = 1; //0.38
     texture.repeat.x = 1;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
   });
+}
+
+export function transformTextureOnResize(texture, factorX, factorY) {
+  if (typeof texture === "object") {
+    texture.repeat.y = 1 * factorY; //0.38
+    texture.repeat.x = 1 * factorX;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+  }
 }

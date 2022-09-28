@@ -50,7 +50,6 @@ img {
   width: 100px;
   height: 100px;
   cursor: pointer;
-  border-radius: 3px;
   position: relative;
 }
 
@@ -100,6 +99,11 @@ select:hover {
   text-decoration: underline;
   text-decoration-color: #495057;
   text-underline-offset: 6px;
+}
+
+.configuration-texture > div,
+.configuration-texture-legs > div {
+  padding: 0 1rem;
 }
 
 .texture-container,

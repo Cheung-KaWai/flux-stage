@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { metal } from "./loadTextures";
 
-import leg1 from "../models/legs/rectangle/leg1.glb?url";
-import leg2 from "../models/legs/rectangle/leg2.glb?url";
+import leg1 from "../models/legs/rectangle/testLeg.glb?url";
+import leg2 from "../models/legs/rectangle/testLeg2.glb?url";
 import leg3 from "../models/legs/circle/legCircle.glb?url";
 import leg4 from "../models/legs/circle/legCircle2.glb?url";
 
@@ -15,11 +15,29 @@ export const listLegModels = {
     leg3,
     leg4,
   },
+  outdoor: {
+    leg1,
+    leg2,
+  },
 };
 
 export const legsMaterial = {
   metal: new THREE.MeshStandardMaterial(metal),
 };
+
+export function positionLeg(leg1, leg2, factor) {
+  const offset = 0.15;
+
+  leg2.position.x = -0.75 * factor + offset;
+  leg1.position.x = 0.75 * factor - offset;
+}
+
+// export function repositionLegs(leg1, leg2, factor) {
+//   const offset = 0.15;
+
+//   leg1.position.x = 0.75 * factor - offset;
+//   leg2.position.x = -0.75 * factor + offset;
+// }
 
 // const material = new THREE.MeshStandardMaterial(metal);
 // const geometry = new THREE.BoxGeometry(1, 1, 1);

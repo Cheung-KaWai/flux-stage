@@ -1,4 +1,4 @@
-import basicRectangle from "../models/tables/rectangle/basic.glb?url";
+import basicRectangle from "../models/tables/rectangle/test.glb?url";
 import roundedRectangle from "../models/tables/rectangle/rounded.glb?url";
 import gapRectangle from "../models/tables/rectangle/gap.glb?url";
 import basicCircle from "../models/tables/circle/basicCircle.glb?url";
@@ -14,11 +14,13 @@ export const listModels = {
   rectangle: {
     basicRectangle,
     roundedRectangle,
-    gapRectangle,
   },
   circle: {
     basicCircle,
     roundedCircle,
+  },
+  outdoor: {
+    gapRectangle,
   },
 };
 

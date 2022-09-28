@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls";
 import { allTextures, listModels } from "./table";
-import { listLegModels, legsMaterial } from "./legs";
+import { listLegModels, legsMaterial, positionLeg } from "./legs";
 import { Pane } from "tweakpane";
-import { loadingManager } from "./loadTextures";
+import { loadingManager, transformTextureOnResize } from "./loadTextures";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
@@ -18,10 +18,24 @@ let dimensions = {
   height: window.innerHeight,
 };
 
-let canvas, camera, ambientLight, scene, controls, renderer, table, tableLegs, material, debug, directLight, floor;
+let canvas,
+  camera,
+  ambientLight,
+  scene,
+  controls,
+  renderer,
+  table,
+  tableLeg1,
+  tableLeg2,
+  material,
+  debug,
+  directLight,
+  floor;
 let currentShape = "rectangle";
 let currentScale = { x: 1, y: 1, z: 1 };
 let currentLegMaterial = new THREE.MeshStandardMaterial(allTextures.metal);
+let currentTexture = allTextures.wood4;
+let currenScale = { x: 1, z: 1 };
 let rescale = {
   rectangle: {
     x: 150,
@@ -56,34 +70,36 @@ function init() {
   camera.position.set(0, 0.75, 1.5);
 
   controls = new OrbitControls(camera, canvas);
-  controls.enablePan = false;
-  controls.minDistance = 1.0;
-  controls.maxDistance = 3.0;
-  controls.maxPolarAngle = Math.PI * 0.6;
+  // controls.enablePan = false;
+  // controls.minDistance = 1.0;
+  // controls.maxDistance = 3.0;
+  // controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
-  ambientLight = new THREE.AmbientLight("#fff", 0.8);
+  ambientLight = new THREE.AmbientLight("#fff", 3.1);
 
-  directLight = new THREE.DirectionalLight("#fff", 3);
+  directLight = new THREE.DirectionalLight("#fff", 0.3);
   directLight.castShadow = true;
-  directLight.position.set(1, 3, -2.5);
-  directLight.shadow.mapSize.width = 4096;
-  directLight.shadow.mapSize.height = 4096;
+  directLight.position.set(0, 2, 0);
   directLight.shadow.camera.near = 1.5;
   directLight.shadow.camera.far = 6;
+  // const directHelper = new THREE.DirectionalLightHelper(directLight);
+  // scene.add(directHelper);
+
+  directLight.shadow.radius = 5;
+  directLight.shadow.blurSamples = 5;
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.physicallyCorrectLights = true;
+  renderer.shadowMap.type = renderer.physicallyCorrectLights = true;
   // renderer.outputEncoding = THREE.sRGBEncoding;
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
   loadTableModel(listModels.rectangle.basicRectangle, material);
-  loadLegModel(listLegModels.rectangle.leg1, legsMaterial.metal);
+  loadLegModel(listLegModels.rectangle.leg1, new THREE.MeshStandardMaterial(allTextures.metal));
 
   //floor for shadow
   addFloor();
@@ -151,17 +167,19 @@ function loadTableModel(model, material) {
 
 function loadLegModel(model, material) {
   gltfLoader.load(model, function (glb) {
-    if (tableLegs) {
-      scene.remove(tableLegs);
-    }
-    tableLegs = glb.scene;
-    tableLegs.traverse((child) => {
+    if (tableLeg1) scene.remove(tableLeg1);
+    if (tableLeg2) scene.remove(tableLeg2);
+
+    tableLeg1 = glb.scene;
+    tableLeg1.traverse((child) => {
       child.material = material;
       child.castShadow = true;
       child.receiveShadow = false;
     });
-    tableLegs.scale.set(...Object.values(currentScale));
-    scene.add(tableLegs);
+    tableLeg2 = tableLeg1.clone();
+    tableLeg2.rotateY(Math.PI);
+    scene.add(tableLeg1, tableLeg2);
+    positionLeg(tableLeg1, tableLeg2, currenScale.x);
   });
 }
 
@@ -169,14 +187,30 @@ function loadLegModel(model, material) {
 const size = document.querySelector(".configuration-size");
 size.addEventListener("change", (event) => {
   const orientation = event.target.dataset.orientation;
+  const size = event.target.value;
+
   if (orientation === "circle") {
-    table.scale.x = event.target.value / rescale.circle.x;
-    table.scale.z = event.target.value / rescale.circle.z;
+    table.scale.x = size / rescale.circle.x;
+    table.scale.z = size / rescale.circle.z;
   } else {
-    table.scale[orientation] = event.target.value / rescale.rectangle[orientation];
-    if (orientation != "y") tableLegs.scale[orientation] = event.target.value / rescale.rectangle[orientation];
+    const factor = size / rescale.rectangle[orientation];
+    table.scale[orientation] = factor;
+
+    // fix repeat texture when resizing
+    currenScale[orientation] = factor;
+    let arrayValues = Object.entries(currentTexture);
+    arrayValues.map((item) => {
+      transformTextureOnResize(item[1], currenScale.x, currenScale.z);
+    });
+
+    table.material = new THREE.MeshStandardMaterial(Object.fromEntries(arrayValues));
+    table.material.needsUpdate = true;
+
+    if (orientation === "x") {
+      positionLeg(tableLeg1, tableLeg2, factor);
+    }
   }
-  currentScale[orientation] = event.target.value / rescale[currentShape][orientation];
+  currentScale[orientation] = size / rescale[currentShape][orientation];
 });
 
 // change shape and show relevent inputfield size
@@ -184,30 +218,31 @@ const shape = document.querySelector(".configuration-shape");
 shape.addEventListener("click", (event) => {
   const objectShape = event.target.dataset.shape;
   const objectType = event.target.dataset.version;
+  currenScale = { x: 1, z: 1 };
+
   if (objectShape) {
-    material = table.material;
+    material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
-    currentScale = { x: 1, y: 1, z: 1 };
+
     if (objectType) {
       loadTableModel(listModels[objectShape][objectType], material);
-      tableLegs.scale.set(1, 1, 1);
       underline(objectType, shapeTypes, "version");
     } else {
       // reset underline
-      for (let i = 0; i < shapeTypes.length; i++) {
-        const element = shapeTypes[i];
-        if (element.dataset.shape === objectShape) {
-          underline(element.dataset.version, shapeTypes, "version");
-          break;
-        }
-      }
-      for (let i = 0; i < legTypes.length; i++) {
-        const element = legTypes[i];
-        if (element.dataset.type === objectShape) {
-          underline(element.dataset.leg, legTypes, "leg");
-          break;
-        }
-      }
+      // for (let i = 0; i < shapeTypes.length; i++) {
+      //   const element = shapeTypes[i];
+      //   if (element.dataset.shape === objectShape) {
+      //     underline(element.dataset.version, shapeTypes, "version");
+      //     break;
+      //   }
+      // }
+      // for (let i = 0; i < legTypes.length; i++) {
+      //   const element = legTypes[i];
+      //   if (element.dataset.type === objectShape) {
+      //     underline(element.dataset.leg, legTypes, "leg");
+      //     break;
+      //   }
+      // }
 
       // load first model of shape table and legs
       loadLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
@@ -221,15 +256,18 @@ shape.addEventListener("click", (event) => {
     Array.from(document.querySelectorAll(".select")).map((input, index) => {
       input.value = resetValues[index];
     });
+    positionLeg(tableLeg1, tableLeg2, 1);
   }
+  console.log(currenScale.x);
 });
 
 //change texture material
 const textures = document.querySelector(".configuration-texture");
 textures.addEventListener("click", (event) => {
   const data = event.target.dataset.texture;
+  currentTexture = allTextures[data];
   if (data) {
-    const newMaterial = new THREE.MeshStandardMaterial(allTextures[data]);
+    const newMaterial = new THREE.MeshStandardMaterial(fixRepeatAndReturnTexture());
     table.traverse((child) => {
       child.material = newMaterial;
       child.material.needsUpdate = true;
@@ -245,7 +283,11 @@ texturesLeg.addEventListener("click", (event) => {
   const data = event.target.dataset.texture;
   if (data) {
     currentLegMaterial = new THREE.MeshStandardMaterial(allTextures[data]);
-    tableLegs.traverse((child) => {
+    tableLeg1.traverse((child) => {
+      child.material = currentLegMaterial;
+      child.material.needsUpdate = true;
+    });
+    tableLeg2.traverse((child) => {
       child.material = currentLegMaterial;
       child.material.needsUpdate = true;
     });
@@ -278,7 +320,7 @@ toggle.addEventListener("click", (ev) => {
   }
 });
 
-// underline type
+// underline option
 function underline(param, list, data) {
   Array.from(list).map((button) => {
     if (button.dataset[data] === param) {
@@ -326,6 +368,22 @@ function showRelevantInput(objectShape) {
   });
 }
 
+function fixRepeatAndReturnTexture() {
+  let arrayValues = Object.entries(currentTexture);
+  arrayValues.map((item) => {
+    transformTextureOnResize(item[1], currenScale.x, currenScale.z);
+  });
+  return Object.fromEntries(arrayValues);
+}
+
+function ResetRepeatAndReturnMaterial() {
+  let arrayValues = Object.entries(currentTexture);
+  arrayValues.map((item) => {
+    transformTextureOnResize(item[1], 1, 1);
+  });
+  return new THREE.MeshStandardMaterial(Object.fromEntries(arrayValues));
+}
+
 init();
 
 ////////////////////////////////// DEBUG ///////////////////////////////////////////
@@ -362,7 +420,7 @@ init();
 // });
 
 // legsDebug
-//   .addInput(tableLegs.children[0].material, "metalness", {
+//   .addInput(tableLeg1.children[0].material, "metalness", {
 //     min: 0,
 //     max: 1,
 //     step: 0.1,

@@ -21,17 +21,32 @@
         <h2 class="mb-1"><span class="step">1</span> | Shape Table</h2>
         <div class="flex-buttons">
           <p class="label">Shape</p>
-          <div>
-            <button data-shape="rectangle" class="underline shape">Rectangle</button>
+          <div class="images-shape">
+            <img src="/src/assets/configurator/shape/rect.jpg" alt="rectangle" data-shape="rectangle" />
+            <img src="/src/assets/configurator/shape/circle.jpg" alt="circle" data-shape="circle" />
+            <img src="/src/assets/configurator/shape/outdoor.jpg" alt="outdoor" data-shape="outdoor" />
+            <!-- <button data-shape="rectangle" class="underline shape">Rectangle</button>
             <button data-shape="circle" class="shape">Circle</button>
+            <button data-shape="outdoor" class="shape">Outdoor</button> -->
           </div>
-          <p class="label">Type</p>
+          <p class="label">Edges finish</p>
           <div>
-            <button data-shape="rectangle" data-version="basicRectangle" class="underline shape-type">Sharp</button>
+            <img
+              src="/src/assets/configurator/edge/sharp.jpg"
+              alt="sharp edge"
+              data-shape="rectangle"
+              data-version="basicRectangle"
+            />
+            <img
+              src="/src/assets/configurator/edge/round.jpg"
+              alt="outdoor"
+              data-shape="rectangle"
+              data-version="roundedRectangle"
+            />
+            <!-- <button data-shape="rectangle" data-version="basicRectangle" class="underline shape-type">Sharp</button>
             <button data-shape="rectangle" data-version="roundedRectangle" class="shape-type">Rounded</button>
-            <button data-shape="rectangle" data-version="gapRectangle" class="shape-type">Outdoor</button>
             <button data-shape="circle" data-version="basicCircle" class="underline shape-type hide">Sharp</button>
-            <button data-shape="circle" data-version="roundedCircle" class="underline shape-type hide">rounded</button>
+            <button data-shape="circle" data-version="roundedCircle" class="underline shape-type hide">rounded</button> -->
           </div>
         </div>
       </div>
@@ -42,8 +57,8 @@
           <label for="length">Length</label>
           <select name="length" id="length-input" data-orientation="x" class="select">
             <option value="150">150 cm</option>
-            <option value="160">160 cm</option>
-            <option value="170">170 cm</option>
+            <option value="200">200 cm</option>
+            <option value="300">300 cm</option>
           </select>
           <!-- <input type="text" name="length" id="length-input" value="150" /> -->
         </div>
@@ -77,21 +92,27 @@
 
       <div class="configuration-texture">
         <h2 class="mb-1"><span class="step">3</span> | Texture Table</h2>
-        <div class="texture-container texture-selected">
-          <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
-          <p>wood1</p>
-        </div>
-        <div class="texture-container">
-          <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" class="texture" />
-          <p>wood2</p>
-        </div>
-        <div class="texture-container">
-          <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
-          <p>wood3</p>
-        </div>
-        <div class="texture-container">
-          <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
-          <p>wood4</p>
+        <div>
+          <div class="texture-container texture-selected">
+            <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
+            <p>wood1</p>
+          </div>
+          <div class="texture-container">
+            <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
+            <p>wood2</p>
+          </div>
+          <div class="texture-container">
+            <img src="/src/assets/table/wood3/Wood030_1K_Color.jpg" data-texture="wood3" class="texture" />
+            <p>wood3</p>
+          </div>
+          <div class="texture-container">
+            <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
+            <p>wood4</p>
+          </div>
+          <div class="texture-container">
+            <img src="/src/assets/image.png" data-texture="check" class="texture" />
+            <p>check</p>
+          </div>
         </div>
       </div>
 
@@ -99,21 +120,37 @@
         <h2 class="mb-1"><span class="step">4</span> | Leg Type</h2>
         <div class="flex-buttons">
           <div>
-            <button data-leg="leg1" class="underline leg" data-type="rectangle">T-Legs</button>
+            <img
+              src="/src/assets/configurator/legs/leg1.jpg"
+              alt="leg type 1"
+              data-leg="leg1"
+              class="leg"
+              data-type="rectangle"
+            />
+            <img
+              src="/src/assets/configurator/legs/leg2.jpg"
+              alt="leg type 2"
+              data-leg="leg2"
+              class="leg"
+              data-type="rectangle"
+            />
+            <!-- <button data-leg="leg1" class="underline leg" data-type="rectangle">T-Legs</button>
             <button data-leg="leg2" class="leg" data-type="rectangle">X-legs</button>
             <button data-leg="leg3" class="underline leg hide" data-type="circle">Cilinder</button>
-            <button data-leg="leg4" class="leg hide" data-type="circle">Cone</button>
+            <button data-leg="leg4" class="leg hide" data-type="circle">Cone</button> -->
           </div>
         </div>
       </div>
 
       <div class="configuration-texture-legs">
         <h2 class="mb-1"><span class="step">5</span> | Texture Legs</h2>
-        <div class="texture-container-leg texture-selected">
-          <img src="/src/assets/legs/Metal009_1K_Color.jpg" data-texture="metal" class="texture" />
-          <p>metal</p>
+        <div>
+          <div class="texture-container-leg texture-selected">
+            <img src="/src/assets/legs/Metal009_1K_Color.jpg" data-texture="metal" class="texture" />
+            <p>metal</p>
+          </div>
         </div>
-        <div class="texture-container-leg">
+        <!-- <div class="texture-container-leg">
           <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
           <p>wood1</p>
         </div>
@@ -128,7 +165,7 @@
         <div class="texture-container-leg">
           <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
           <p>wood4</p>
-        </div>
+        </div> -->
       </div>
     </div>
 
