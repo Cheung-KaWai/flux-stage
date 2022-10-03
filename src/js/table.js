@@ -1,10 +1,10 @@
 import basicRectangle from "../models/tables/rectangle/test.glb?url";
 import roundedRectangle from "../models/tables/rectangle/rounded.glb?url";
-import gapRectangle from "../models/tables/rectangle/gap.glb?url";
-import basicCircle from "../models/tables/circle/basicCircle.glb?url";
+import outdoorBasic from "../models/tables/outdoor/outdoor2.glb?url";
+import basicCircle from "../models/tables/circle/circleBasic.glb?url";
 import roundedCircle from "../models/tables/circle/roundedCircle.glb?url";
 
-import { wood2, wood3, wood4, wood1, checkTexture, metal } from "./loadTextures";
+import { wood2, wood3, wood4, wood1, checkTexture, metal, metal2 } from "./loadTextures";
 
 const check = {
   map: checkTexture,
@@ -20,7 +20,7 @@ export const listModels = {
     roundedCircle,
   },
   outdoor: {
-    gapRectangle,
+    outdoorBasic,
   },
 };
 
@@ -31,6 +31,7 @@ export const allTextures = {
   wood1,
   check,
   metal,
+  metal2,
 };
 
 // export function createTable(shape, material) {

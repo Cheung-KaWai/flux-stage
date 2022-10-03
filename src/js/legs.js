@@ -3,8 +3,8 @@ import { metal } from "./loadTextures";
 
 import leg1 from "../models/legs/rectangle/testLeg.glb?url";
 import leg2 from "../models/legs/rectangle/testLeg2.glb?url";
-import leg3 from "../models/legs/circle/legCircle.glb?url";
-import leg4 from "../models/legs/circle/legCircle2.glb?url";
+// import leg3 from "../models/legs/circle/circleLegs1.glb?url";
+import leg3 from "../models/legs/circle/legCircle2.glb?url";
 
 export const listLegModels = {
   rectangle: {
@@ -13,7 +13,6 @@ export const listLegModels = {
   },
   circle: {
     leg3,
-    leg4,
   },
   outdoor: {
     leg1,

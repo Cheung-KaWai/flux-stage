@@ -38,11 +38,10 @@ const metalRoughness = textureLoader.load("/src/assets/legs/Metal009_1K_Roughnes
 const normalMap = textureLoader.load("/src/assets/legs/Metal009_1K_NormalDX.jpg");
 const metallicMap = textureLoader.load("/src/assets/legs/Metal009_1K_Metalness.jpg");
 
-metalColorTexture.repeat.y = 1;
-metalColorTexture.repeat.x = 0.125;
-
-metalColorTexture.wrapS = THREE.RepeatWrapping;
-metalColorTexture.wrapT = THREE.RepeatWrapping;
+const metalColorTexture2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_Color.jpg");
+const metalRoughness2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_Roughness.jpg");
+const normalMap2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_NormalDX.jpg");
+const metallicMap2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_Metalness.jpg");
 
 const environmentMapTexture = cubeTextureLoader.load([
   "/src/assets/env/v2/px.jpg",
@@ -55,13 +54,24 @@ const environmentMapTexture = cubeTextureLoader.load([
 
 export const metal = {
   map: metalColorTexture,
-  roughness: 0.2,
+  roughness: 0,
   metalnessMap: metallicMap,
   metalness: 1,
   envMap: environmentMapTexture,
-  envMapIntensity: 0.5,
+  envMapIntensity: 1,
   normalMap: normalMap,
   roughnessMap: metalRoughness,
+};
+
+export const metal2 = {
+  map: metalColorTexture2,
+  roughness: 0,
+  metalnessMap: metallicMap2,
+  metalness: 1,
+  envMap: environmentMapTexture,
+  envMapIntensity: 0.8,
+  // normalMap: normalMap2,
+  roughnessMap: metalRoughness2,
 };
 
 const tableColorTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Color.jpg");
@@ -82,27 +92,8 @@ const tableRoughnessTextureWood2 = textureLoader.load("/src/assets/table/wood2/W
 const tableNormalTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood051_1K_NormalDx.jpg");
 
 const checkTexture = textureLoader.load("/src/assets/image.png");
-checkTexture.repeat.x = 1;
-checkTexture.repeat.y = 0.4;
 
 export { checkTexture };
-
-transformTexture([
-  tableColorTextureWood4,
-  tableRoughnessTextureWood4,
-  tableNormalTextureWood4,
-  tableColorTextureWood3,
-  tableRoughnessTextureWood3,
-  tableNormalTextureWood3,
-  tableColorTextureWood1,
-  tableRoughnessTextureWood1,
-  tableNormalTextureWood1,
-  tableAmbientOcclusionTextureWood1,
-  tableColorTextureWood2,
-  tableRoughnessTextureWood2,
-  tableNormalTextureWood2,
-  checkTexture,
-]);
 
 export const wood1 = {
   map: tableColorTextureWood1,
@@ -134,9 +125,30 @@ export const wood4 = {
   normalMap: tableNormalTextureWood4,
 };
 
+transformTexture([
+  tableColorTextureWood4,
+  tableRoughnessTextureWood4,
+  tableNormalTextureWood4,
+  tableColorTextureWood3,
+  tableRoughnessTextureWood3,
+  tableNormalTextureWood3,
+  tableColorTextureWood1,
+  tableRoughnessTextureWood1,
+  tableNormalTextureWood1,
+  tableAmbientOcclusionTextureWood1,
+  tableColorTextureWood2,
+  tableRoughnessTextureWood2,
+  tableNormalTextureWood2,
+  checkTexture,
+  metalColorTexture,
+  metalRoughness,
+  normalMap,
+  metallicMap,
+]);
+
 function transformTexture(textures) {
   textures.map((texture) => {
-    texture.repeat.y = 1; //0.38
+    texture.repeat.y = 1;
     texture.repeat.x = 1;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -145,7 +157,7 @@ function transformTexture(textures) {
 
 export function transformTextureOnResize(texture, factorX, factorY) {
   if (typeof texture === "object") {
-    texture.repeat.y = 1 * factorY; //0.38
+    texture.repeat.y = 1 * factorY;
     texture.repeat.x = 1 * factorX;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;

@@ -32,10 +32,9 @@ let canvas,
   directLight,
   floor;
 let currentShape = "rectangle";
-let currentScale = { x: 1, y: 1, z: 1 };
 let currentLegMaterial = new THREE.MeshStandardMaterial(allTextures.metal);
 let currentTexture = allTextures.wood4;
-let currenScale = { x: 1, z: 1 };
+let currentScale = { x: 1, y: 1, z: 1 };
 let rescale = {
   rectangle: {
     x: 150,
@@ -46,6 +45,11 @@ let rescale = {
     x: 150,
     z: 150,
   },
+  outdoor: {
+    x: 150,
+    y: 5,
+    z: 60,
+  },
 };
 
 const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
@@ -54,10 +58,10 @@ const legTypes = Array.from(document.querySelectorAll(".leg"));
 const toggle = document.querySelector("#arrow");
 const resetValues = [150, 60, 150, 5];
 
-const shapeButtons = document.querySelectorAll(".shape");
-const legButtons = document.querySelectorAll(".leg");
-const textureButtons = document.querySelectorAll(".texture-container");
-const textureButtonsLeg = document.querySelectorAll(".texture-container-leg");
+const shapeButtons = Array.from(document.querySelectorAll(".shape"));
+const legButtons = Array.from(document.querySelectorAll(".leg"));
+const textureButtons = Array.from(document.querySelectorAll(".texture-container"));
+const textureButtonsLeg = Array.from(document.querySelectorAll(".texture-leg"));
 
 // create basic scene
 function init() {
@@ -67,39 +71,48 @@ function init() {
   scene.background = new THREE.Color("#fff");
 
   camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 100);
-  camera.position.set(0, 0.75, 1.5);
+  camera.position.set(1, 0.3, 2);
 
   controls = new OrbitControls(camera, canvas);
   // controls.enablePan = false;
   // controls.minDistance = 1.0;
   // controls.maxDistance = 3.0;
-  // controls.maxPolarAngle = Math.PI * 0.6;
+  controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
-  ambientLight = new THREE.AmbientLight("#fff", 3.1);
+  ambientLight = new THREE.AmbientLight("#fff", 3.1); // 3.1
 
   directLight = new THREE.DirectionalLight("#fff", 0.3);
   directLight.castShadow = true;
   directLight.position.set(0, 2, 0);
-  directLight.shadow.camera.near = 1.5;
-  directLight.shadow.camera.far = 6;
+  directLight.shadow.camera.near = 1;
+  directLight.shadow.camera.far = 2.5;
+  directLight.shadow.camera.top = 1;
+  directLight.shadow.camera.right = 2;
+  directLight.shadow.camera.bottom = -1;
+  directLight.shadow.camera.left = -2;
+  directLight.shadow.mapSize.width = 1024;
+  directLight.shadow.mapSize.height = 1024;
   // const directHelper = new THREE.DirectionalLightHelper(directLight);
   // scene.add(directHelper);
+  const directionalLightCameraHelper = new THREE.CameraHelper(directLight.shadow.camera);
+  directionalLightCameraHelper.visible = false;
+  scene.add(directionalLightCameraHelper);
 
-  directLight.shadow.radius = 5;
-  directLight.shadow.blurSamples = 5;
+  directLight.shadow.radius = 10;
 
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = renderer.physicallyCorrectLights = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.physicallyCorrectLights = true;
   // renderer.outputEncoding = THREE.sRGBEncoding;
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
   loadTableModel(listModels.rectangle.basicRectangle, material);
-  loadLegModel(listLegModels.rectangle.leg1, new THREE.MeshStandardMaterial(allTextures.metal));
+  loadLegModel(listLegModels.rectangle.leg1, currentLegMaterial);
 
   //floor for shadow
   addFloor();
@@ -144,7 +157,7 @@ function addFloor() {
     new THREE.MeshStandardMaterial({ color: "#fff", roughness: 0.7 })
   );
   floor.receiveShadow = true;
-  floor.position.set(0, -0.51, 0);
+  floor.position.set(0, -0.41, 0);
   floor.rotateX(-Math.PI * 0.5);
 
   scene.add(floor);
@@ -167,8 +180,7 @@ function loadTableModel(model, material) {
 
 function loadLegModel(model, material) {
   gltfLoader.load(model, function (glb) {
-    if (tableLeg1) scene.remove(tableLeg1);
-    if (tableLeg2) scene.remove(tableLeg2);
+    scene.remove(tableLeg1, tableLeg2);
 
     tableLeg1 = glb.scene;
     tableLeg1.traverse((child) => {
@@ -176,10 +188,28 @@ function loadLegModel(model, material) {
       child.castShadow = true;
       child.receiveShadow = false;
     });
+    scene.add(tableLeg1);
+
+    if (currentShape === "circle") return;
+
     tableLeg2 = tableLeg1.clone();
     tableLeg2.rotateY(Math.PI);
-    scene.add(tableLeg1, tableLeg2);
-    positionLeg(tableLeg1, tableLeg2, currenScale.x);
+    positionLeg(tableLeg1, tableLeg2, currentScale.x);
+    scene.add(tableLeg2);
+  });
+}
+
+function loadCircleLegModel(model, material) {
+  gltfLoader.load(model, function (glb) {
+    scene.remove(tableLeg1, tableLeg2);
+
+    tableLeg1 = glb.scene;
+    tableLeg1.traverse((child) => {
+      child.material = material;
+      child.castShadow = true;
+      child.receiveShadow = false;
+    });
+    scene.add(tableLeg1);
   });
 }
 
@@ -197,10 +227,10 @@ size.addEventListener("change", (event) => {
     table.scale[orientation] = factor;
 
     // fix repeat texture when resizing
-    currenScale[orientation] = factor;
+    currentScale[orientation] = factor;
     let arrayValues = Object.entries(currentTexture);
     arrayValues.map((item) => {
-      transformTextureOnResize(item[1], currenScale.x, currenScale.z);
+      transformTextureOnResize(item[1], currentScale.x, currentScale.z);
     });
 
     table.material = new THREE.MeshStandardMaterial(Object.fromEntries(arrayValues));
@@ -218,48 +248,56 @@ const shape = document.querySelector(".configuration-shape");
 shape.addEventListener("click", (event) => {
   const objectShape = event.target.dataset.shape;
   const objectType = event.target.dataset.version;
-  currenScale = { x: 1, z: 1 };
+  currentScale = { x: 1, z: 1 };
 
-  if (objectShape) {
+  if (objectShape && objectShape !== "circle") {
     material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
+    if (objectType) {
+      loadTableModel(listModels[objectShape][objectType], material);
+      addBorderElement(objectType, shapeTypes, "version");
+    } else {
+      // load first model of shape table and legs
+      scene.remove(table);
+      scene.remove(tableLeg1, tableLeg2);
+      loadLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
+      loadTableModel(Object.values(listModels[objectShape])[0], material);
+      addBorderFirsElement(currentShape, shapeTypes);
+    }
+    positionLeg(tableLeg1, tableLeg2, 1);
+    ResetUIConfigurator();
+    addBorderElement(objectShape, shapeButtons, "shape");
+    addBorderFirsElement(currentShape, legButtons);
+  }
+
+  if (objectShape && objectShape == "circle") {
+    material = ResetRepeatAndReturnMaterial();
+    currentShape = objectShape;
+    scene.remove(table);
 
     if (objectType) {
       loadTableModel(listModels[objectShape][objectType], material);
-      underline(objectType, shapeTypes, "version");
+      addBorderElement(objectType, shapeTypes, "version");
     } else {
-      // reset underline
-      // for (let i = 0; i < shapeTypes.length; i++) {
-      //   const element = shapeTypes[i];
-      //   if (element.dataset.shape === objectShape) {
-      //     underline(element.dataset.version, shapeTypes, "version");
-      //     break;
-      //   }
-      // }
-      // for (let i = 0; i < legTypes.length; i++) {
-      //   const element = legTypes[i];
-      //   if (element.dataset.type === objectShape) {
-      //     underline(element.dataset.leg, legTypes, "leg");
-      //     break;
-      //   }
-      // }
-
       // load first model of shape table and legs
-      loadLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
-      loadTableModel(Object.values(listModels[objectShape])[0], material);
+      scene.remove(tableLeg1, tableLeg2);
+      loadTableModel(Object.values(listModels[currentShape])[0], material);
+      loadCircleLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
+      addBorderFirsElement(currentShape, shapeTypes);
     }
-
-    underline(objectShape, shapeButtons, "shape");
-    showRelevantInput(objectShape);
-
-    // reset values
-    Array.from(document.querySelectorAll(".select")).map((input, index) => {
-      input.value = resetValues[index];
-    });
-    positionLeg(tableLeg1, tableLeg2, 1);
+    ResetUIConfigurator();
+    addBorderElement(objectShape, shapeButtons, "shape");
+    addBorderFirsElement(currentShape, legButtons);
   }
-  console.log(currenScale.x);
 });
+
+function ResetUIConfigurator() {
+  showRelevantInput(currentShape);
+  // reset values
+  Array.from(document.querySelectorAll(".select")).map((input, index) => {
+    input.value = resetValues[index];
+  });
+}
 
 //change texture material
 const textures = document.querySelector(".configuration-texture");
@@ -273,7 +311,7 @@ textures.addEventListener("click", (event) => {
       child.material.needsUpdate = true;
     });
 
-    showSelectedTexture(data, textureButtons);
+    showSelectedElement(data, textureButtons, "texture");
   }
 });
 
@@ -291,8 +329,8 @@ texturesLeg.addEventListener("click", (event) => {
       child.material = currentLegMaterial;
       child.material.needsUpdate = true;
     });
+    addBorderElement(data, textureButtonsLeg, "texture");
   }
-  showSelectedTexture(data, textureButtonsLeg);
 });
 
 //change types legs
@@ -301,7 +339,7 @@ typeLeg.addEventListener("click", (event) => {
   const data = event.target.dataset.leg;
   if (data) {
     loadLegModel(listLegModels[currentShape][data], currentLegMaterial);
-    underline(data, legButtons, "leg");
+    addBorderElement(data, legButtons, "leg");
   }
 });
 
@@ -321,25 +359,46 @@ toggle.addEventListener("click", (ev) => {
 });
 
 // underline option
-function underline(param, list, data) {
-  Array.from(list).map((button) => {
-    if (button.dataset[data] === param) {
-      button.classList.add("underline");
+// function underline(param, list, data) {
+//   Array.from(list).map((button) => {
+//     if (button.dataset[data] === param) {
+//       button.classList.add("underline");
+//     } else {
+//       button.classList.remove("underline");
+//     }
+//   });
+// }
+
+// add dot on selected texture
+function showSelectedElement(param, list, dataset) {
+  list.map((button) => {
+    const value = button.children[0].dataset[dataset];
+    if (value === param) {
+      button.classList.add("selected");
     } else {
-      button.classList.remove("underline");
+      button.classList.remove("selected");
     }
   });
 }
 
-// add dot on selected texture
-function showSelectedTexture(param, list) {
-  Array.from(list).map((button) => {
-    if (button.children[0].dataset.texture === param) {
-      button.classList.add("texture-selected");
+function addBorderElement(param, list, dataset) {
+  list.map((button) => {
+    if (button.dataset[dataset] === param) {
+      button.classList.add("border");
     } else {
-      button.classList.remove("texture-selected");
+      button.classList.remove("border");
     }
   });
+}
+
+function addBorderFirsElement(shape, list) {
+  list.map((el) => el.classList.remove("border"));
+  for (let element of list) {
+    if (element.dataset.shape.includes(shape)) {
+      element.classList.add("border");
+      break;
+    }
+  }
 }
 
 function showRelevantInput(objectShape) {
@@ -352,7 +411,7 @@ function showRelevantInput(objectShape) {
   });
 
   shapeTypes.map((shape) => {
-    if (shape.dataset.shape === currentShape) {
+    if (shape.dataset.shape.includes(objectShape)) {
       shape.classList.remove("hide");
     } else {
       shape.classList.add("hide");
@@ -360,7 +419,7 @@ function showRelevantInput(objectShape) {
   });
 
   legTypes.map((leg) => {
-    if (leg.dataset.type === currentShape) {
+    if (leg.dataset.type.includes(objectShape)) {
       leg.classList.remove("hide");
     } else {
       leg.classList.add("hide");
@@ -371,7 +430,7 @@ function showRelevantInput(objectShape) {
 function fixRepeatAndReturnTexture() {
   let arrayValues = Object.entries(currentTexture);
   arrayValues.map((item) => {
-    transformTextureOnResize(item[1], currenScale.x, currenScale.z);
+    transformTextureOnResize(item[1], currentScale.x, currentScale.z);
   });
   return Object.fromEntries(arrayValues);
 }
