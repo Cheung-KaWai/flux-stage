@@ -29,6 +29,8 @@ export function positionLeg(leg1, leg2, factor) {
 
   leg2.position.x = -0.75 * factor + offset;
   leg1.position.x = 0.75 * factor - offset;
+  // shadow1.position.x = 0.75 * factor - offset;
+  // shadow2.position.x = -0.75 * factor + offset;
 }
 
 // export function repositionLegs(leg1, leg2, factor) {

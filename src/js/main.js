@@ -3,7 +3,7 @@ import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitCo
 import { allTextures, listModels } from "./table";
 import { listLegModels, legsMaterial, positionLeg } from "./legs";
 import { Pane } from "tweakpane";
-import { loadingManager, transformTextureOnResize } from "./loadTextures";
+import { loadingManager, transformTextureOnResize, shadowsTextures } from "./loadTextures";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
@@ -12,6 +12,12 @@ const dracoLoader = new DRACOLoader(loadingManager);
 dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.4.3/");
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
+
+import vertexShader from "./../shaders/vertexShader.glsl?raw";
+import fragmentShader from "./../shaders/fragmentShader.glsl?raw";
+
+import shadowFloor from "../models/floorNew.glb?url";
+import shadowFloorLegs from "../models/planeLeg.glb?url";
 
 let dimensions = {
   width: window.innerWidth * 0.74,
@@ -27,14 +33,16 @@ let canvas,
   table,
   tableLeg1,
   tableLeg2,
+  shadowLegs1,
+  shadowLegs2,
   material,
-  debug,
   directLight,
   floor;
 let currentShape = "rectangle";
 let currentLegMaterial = new THREE.MeshStandardMaterial(allTextures.metal);
 let currentTexture = allTextures.wood4;
 let currentScale = { x: 1, y: 1, z: 1 };
+let currentLegType = "leg1";
 let rescale = {
   rectangle: {
     x: 150,
@@ -51,6 +59,8 @@ let rescale = {
     z: 60,
   },
 };
+// const shadowRescale = { x: 0.7, z: 0.5 };
+let shadow;
 
 const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
 const shapeTypes = Array.from(document.querySelectorAll(".shape-type"));
@@ -70,19 +80,19 @@ function init() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color("#fff");
 
-  camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 100);
+  camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.001, 1000);
   camera.position.set(1, 0.3, 2);
 
   controls = new OrbitControls(camera, canvas);
   // controls.enablePan = false;
   // controls.minDistance = 1.0;
   // controls.maxDistance = 3.0;
-  controls.maxPolarAngle = Math.PI * 0.6;
+  // controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
   ambientLight = new THREE.AmbientLight("#fff", 3.1); // 3.1
 
-  directLight = new THREE.DirectionalLight("#fff", 0.3);
+  directLight = new THREE.DirectionalLight("#fff", 0.7);
   directLight.castShadow = true;
   directLight.position.set(0, 2, 0);
   directLight.shadow.camera.near = 1;
@@ -111,11 +121,13 @@ function init() {
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
+  shadowBaked();
   loadTableModel(listModels.rectangle.basicRectangle, material);
   loadLegModel(listLegModels.rectangle.leg1, currentLegMaterial);
 
   //floor for shadow
-  addFloor();
+  // addFloor();
+  // AddShadowFloor();
 
   window.addEventListener("resize", onWindowResize);
   scene.add(camera, ambientLight, directLight);
@@ -194,7 +206,7 @@ function loadLegModel(model, material) {
 
     tableLeg2 = tableLeg1.clone();
     tableLeg2.rotateY(Math.PI);
-    positionLeg(tableLeg1, tableLeg2, currentScale.x);
+    positionLeg(tableLeg1, tableLeg2, currentScale.x, shadowLegs1, shadowLegs2);
     scene.add(tableLeg2);
   });
 }
@@ -225,6 +237,9 @@ size.addEventListener("change", (event) => {
   } else {
     const factor = size / rescale.rectangle[orientation];
     table.scale[orientation] = factor;
+    shadow.scale[orientation] = factor;
+
+    // === 1 ? factor : factor * shadowRescale[orientation]
 
     // fix repeat texture when resizing
     currentScale[orientation] = factor;
@@ -237,7 +252,7 @@ size.addEventListener("change", (event) => {
     table.material.needsUpdate = true;
 
     if (orientation === "x") {
-      positionLeg(tableLeg1, tableLeg2, factor);
+      positionLeg(tableLeg1, tableLeg2, factor, shadowLegs1, shadowLegs2);
     }
   }
   currentScale[orientation] = size / rescale[currentShape][orientation];
@@ -253,6 +268,7 @@ shape.addEventListener("click", (event) => {
   if (objectShape && objectShape !== "circle") {
     material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
+    shadowBaked();
     if (objectType) {
       loadTableModel(listModels[objectShape][objectType], material);
       addBorderElement(objectType, shapeTypes, "version");
@@ -264,7 +280,7 @@ shape.addEventListener("click", (event) => {
       loadTableModel(Object.values(listModels[objectShape])[0], material);
       addBorderFirsElement(currentShape, shapeTypes);
     }
-    positionLeg(tableLeg1, tableLeg2, 1);
+    positionLeg(tableLeg1, tableLeg2, 1, shadowLegs1, shadowLegs2);
     ResetUIConfigurator();
     addBorderElement(objectShape, shapeButtons, "shape");
     addBorderFirsElement(currentShape, legButtons);
@@ -273,6 +289,7 @@ shape.addEventListener("click", (event) => {
   if (objectShape && objectShape == "circle") {
     material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
+    shadowBaked();
     scene.remove(table);
 
     if (objectType) {
@@ -338,7 +355,9 @@ const typeLeg = document.querySelector(".configuration-legs");
 typeLeg.addEventListener("click", (event) => {
   const data = event.target.dataset.leg;
   if (data) {
+    currentLegType = data;
     loadLegModel(listLegModels[currentShape][data], currentLegMaterial);
+    shadowBaked();
     addBorderElement(data, legButtons, "leg");
   }
 });
@@ -357,17 +376,6 @@ toggle.addEventListener("click", (ev) => {
     toggle.style.transform = "rotateY(180deg)";
   }
 });
-
-// underline option
-// function underline(param, list, data) {
-//   Array.from(list).map((button) => {
-//     if (button.dataset[data] === param) {
-//       button.classList.add("underline");
-//     } else {
-//       button.classList.remove("underline");
-//     }
-//   });
-// }
 
 // add dot on selected texture
 function showSelectedElement(param, list, dataset) {
@@ -441,6 +449,89 @@ function ResetRepeatAndReturnMaterial() {
     transformTextureOnResize(item[1], 1, 1);
   });
   return new THREE.MeshStandardMaterial(Object.fromEntries(arrayValues));
+}
+
+function AddShadowFloor() {
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    side: THREE.DoubleSide,
+  });
+  const geometry = new THREE.PlaneGeometry(1.5, 1.5, 32, 32);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotateX(Math.PI * 0.5);
+  mesh.position.y = -0.41;
+  scene.add(mesh);
+}
+
+function shadowBaked() {
+  //shadow V2
+  gltfLoader.load(shadowFloor, function (glb) {
+    scene.remove(shadow);
+    shadow = glb.scene;
+    const shadowTextureShape = shadowsTextures.table[currentShape];
+    shadowTextureShape.flipY = false;
+    shadowTextureShape.encoding = THREE.sRGBEncoding;
+    const shadowMaterial = new THREE.MeshBasicMaterial({
+      color: "#000",
+      transparent: true,
+      opacity: 1,
+      alphaMap: shadowTextureShape,
+    });
+    shadow.traverse((child) => {
+      child.material = shadowMaterial;
+    });
+    shadow.scale.x = currentScale.x;
+    shadow.scale.z = currentScale.z;
+    // shadow.scale.set(shadowRescale.x, 1, shadowRescale.z);
+    scene.add(shadow);
+  });
+
+  // if (currentShape === "circle") {
+  //   gltfLoader.load(shadowFloor, function (glb) {
+  //     scene.remove(shadowLegs1, shadowLegs2);
+  //     shadowLegs1 = glb.scene;
+
+  //     const shadowTextureLegs = shadowsTextures.legs[currentShape][currentLegType];
+
+  //     shadowTextureLegs.flipY = false;
+  //     shadowTextureLegs.encoding = THREE.sRGBEncoding;
+  //     const shadowMaterialLegs = new THREE.MeshBasicMaterial({
+  //       color: "#000",
+  //       transparent: true,
+  //       opacity: 0.8,
+  //       alphaMap: shadowTextureLegs,
+  //     });
+  //     shadowLegs1.children[0].material = shadowMaterialLegs;
+  //     shadowLegs1.position.y = 0.001;
+  //     scene.add(shadowLegs1);
+  //   });
+  // } else {
+  //   gltfLoader.load(shadowFloorLegs, function (glb) {
+  //     scene.remove(shadowLegs1, shadowLegs2);
+  //     shadowLegs1 = glb.scene;
+
+  //     const shadowTextureLegs = shadowsTextures.legs[currentShape][currentLegType];
+
+  //     shadowTextureLegs.flipY = false;
+  //     shadowTextureLegs.encoding = THREE.sRGBEncoding;
+  //     const shadowMaterialLegs = new THREE.MeshBasicMaterial({
+  //       color: "#000",
+  //       transparent: true,
+  //       opacity: 0.8,
+  //       alphaMap: shadowTextureLegs,
+  //     });
+  //     shadowLegs1.children[0].material = shadowMaterialLegs;
+  //     shadowLegs1.position.y = 0.001;
+  //     shadowLegs1.position.x = 0.75 * currentScale.x - 0.15;
+
+  //     shadowLegs2 = shadowLegs1.clone();
+  //     shadowLegs2.rotateY(Math.PI);
+  //     shadowLegs2.position.y = 0.001;
+  //     shadowLegs2.position.x = -0.75 * currentScale.x + 0.15;
+  //     scene.add(shadowLegs1, shadowLegs2);
+  //   });
+  // }
 }
 
 init();

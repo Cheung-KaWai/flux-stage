@@ -44,12 +44,12 @@ const normalMap2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_NormalD
 const metallicMap2 = textureLoader.load("/src/assets/legs/leg2/Metal012_1K_Metalness.jpg");
 
 const environmentMapTexture = cubeTextureLoader.load([
-  "/src/assets/env/v2/px.jpg",
-  "/src/assets/env/v2/nx.jpg",
-  "/src/assets/env/v2/py.jpg",
-  "/src/assets/env/v2/ny.jpg",
-  "/src/assets/env/v2/pz.jpg",
-  "/src/assets/env/v2/nz.jpg",
+  "/src/assets/env/v2/px.png",
+  "/src/assets/env/v2/nx.png",
+  "/src/assets/env/v2/py.png",
+  "/src/assets/env/v2/ny.png",
+  "/src/assets/env/v2/pz.png",
+  "/src/assets/env/v2/nz.png",
 ]);
 
 export const metal = {
@@ -58,7 +58,7 @@ export const metal = {
   metalnessMap: metallicMap,
   metalness: 1,
   envMap: environmentMapTexture,
-  envMapIntensity: 1,
+  envMapIntensity: 0.8,
   normalMap: normalMap,
   roughnessMap: metalRoughness,
 };
@@ -70,7 +70,7 @@ export const metal2 = {
   metalness: 1,
   envMap: environmentMapTexture,
   envMapIntensity: 0.8,
-  // normalMap: normalMap2,
+  normalMap: normalMap2,
   roughnessMap: metalRoughness2,
 };
 
@@ -91,9 +91,29 @@ const tableColorTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood0
 const tableRoughnessTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood051_1K_Roughness.jpg");
 const tableNormalTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood051_1K_NormalDx.jpg");
 
-const checkTexture = textureLoader.load("/src/assets/image.png");
+export const checkTexture = textureLoader.load("/src/assets/image.png");
 
-export { checkTexture };
+const shadowTableRect = textureLoader.load("/src/assets/shadows/tableShadow2.jpg");
+const shadowTableCircle = textureLoader.load("/src/assets/shadows/circleShadow.jpg");
+const shadowTextureLeg1 = textureLoader.load("/src/assets/shadows/shadowLegs1.jpg");
+const shadowTextureLeg2 = textureLoader.load("/src/assets/shadows/shadowLegs2.jpg");
+const shadowTextureLeg3 = textureLoader.load("/src/assets/shadows/circleShadowLegs.jpg");
+
+export const shadowsTextures = {
+  table: {
+    rectangle: shadowTableRect,
+    circle: shadowTableCircle,
+  },
+  legs: {
+    rectangle: {
+      leg1: shadowTextureLeg1,
+      leg2: shadowTextureLeg2,
+    },
+    circle: {
+      leg3: shadowTextureLeg3,
+    },
+  },
+};
 
 export const wood1 = {
   map: tableColorTextureWood1,
