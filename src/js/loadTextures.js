@@ -77,6 +77,7 @@ export const metal2 = {
 const tableColorTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Color.jpg");
 const tableRoughnessTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Roughness.jpg");
 const tableNormalTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_NormalDx.jpg");
+const tableDisplacementTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Displacement.jpg");
 
 const tableColorTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Color.jpg");
 const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Roughness.jpg");
@@ -93,16 +94,17 @@ const tableNormalTextureWood2 = textureLoader.load("/src/assets/table/wood2/Wood
 
 export const checkTexture = textureLoader.load("/src/assets/image.png");
 
-const shadowTableRect = textureLoader.load("/src/assets/shadows/tableShadow2.jpg");
+const shadowTableRect = textureLoader.load("/src/assets/shadows/tableShadow3.jpg");
 const shadowTableCircle = textureLoader.load("/src/assets/shadows/circleShadow.jpg");
-const shadowTextureLeg1 = textureLoader.load("/src/assets/shadows/shadowLegs1.jpg");
-const shadowTextureLeg2 = textureLoader.load("/src/assets/shadows/shadowLegs2.jpg");
-const shadowTextureLeg3 = textureLoader.load("/src/assets/shadows/circleShadowLegs.jpg");
+const shadowTextureLeg1 = textureLoader.load("/src/assets/shadows/shadowLegs1V3.jpg");
+const shadowTextureLeg2 = textureLoader.load("/src/assets/shadows/shadowLegs2V2.jpg");
+const shadowTextureLeg3 = textureLoader.load("/src/assets/shadows/shadowLegs3V2.jpg");
 
 export const shadowsTextures = {
   table: {
     rectangle: shadowTableRect,
     circle: shadowTableCircle,
+    outdoor: shadowTableRect,
   },
   legs: {
     rectangle: {
@@ -111,6 +113,10 @@ export const shadowsTextures = {
     },
     circle: {
       leg3: shadowTextureLeg3,
+    },
+    outdoor: {
+      leg1: shadowTextureLeg1,
+      leg2: shadowTextureLeg2,
     },
   },
 };
@@ -164,6 +170,8 @@ transformTexture([
   metalRoughness,
   normalMap,
   metallicMap,
+  shadowTableRect,
+  shadowTableCircle,
 ]);
 
 function transformTexture(textures) {
@@ -172,6 +180,7 @@ function transformTexture(textures) {
     texture.repeat.x = 1;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
+    texture.encoding = THREE.sRGBEncoding;
   });
 }
 

@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { metal } from "./loadTextures";
 
-import leg1 from "../models/legs/rectangle/testLeg.glb?url";
-import leg2 from "../models/legs/rectangle/testLeg2.glb?url";
+import leg1 from "../models/legs/rectangle/leg1.glb?url";
+import leg2 from "../models/legs/rectangle/leg2.glb?url";
 // import leg3 from "../models/legs/circle/circleLegs1.glb?url";
-import leg3 from "../models/legs/circle/legCircle2.glb?url";
+import leg3 from "../models/legs/circle/leg3.glb?url";
 
 export const listLegModels = {
   rectangle: {
@@ -24,13 +24,13 @@ export const legsMaterial = {
   metal: new THREE.MeshStandardMaterial(metal),
 };
 
-export function positionLeg(leg1, leg2, factor) {
-  const offset = 0.15;
+export function positionLeg(leg1, leg2, factor, shadow1, shadow2) {
+  const offsetShadow = 0.15;
 
-  leg2.position.x = -0.75 * factor + offset;
-  leg1.position.x = 0.75 * factor - offset;
-  // shadow1.position.x = 0.75 * factor - offset;
-  // shadow2.position.x = -0.75 * factor + offset;
+  leg2.position.x = -0.75 * factor + offsetShadow;
+  leg1.position.x = 0.75 * factor - offsetShadow;
+  shadow1.position.x = 0.75 * factor - offsetShadow;
+  shadow2.position.x = -0.75 * factor + offsetShadow;
 }
 
 // export function repositionLegs(leg1, leg2, factor) {

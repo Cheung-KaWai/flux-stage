@@ -16,8 +16,8 @@ gltfLoader.setDRACOLoader(dracoLoader);
 import vertexShader from "./../shaders/vertexShader.glsl?raw";
 import fragmentShader from "./../shaders/fragmentShader.glsl?raw";
 
-import shadowFloor from "../models/floorNew.glb?url";
-import shadowFloorLegs from "../models/planeLeg.glb?url";
+import shadowSquare from "../models/shadowSquare.glb?url";
+import shadowSmallRectangle from "../models/shadowSmallRectangle.glb?url";
 
 let dimensions = {
   width: window.innerWidth * 0.74,
@@ -43,6 +43,7 @@ let currentLegMaterial = new THREE.MeshStandardMaterial(allTextures.metal);
 let currentTexture = allTextures.wood4;
 let currentScale = { x: 1, y: 1, z: 1 };
 let currentLegType = "leg1";
+let currentShadow = "leg1";
 let rescale = {
   rectangle: {
     x: 150,
@@ -90,38 +91,48 @@ function init() {
   // controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
-  ambientLight = new THREE.AmbientLight("#fff", 3.1); // 3.1
+  ambientLight = new THREE.AmbientLight("#fff", 3); // 3.1
 
-  directLight = new THREE.DirectionalLight("#fff", 0.7);
-  directLight.castShadow = true;
-  directLight.position.set(0, 2, 0);
-  directLight.shadow.camera.near = 1;
-  directLight.shadow.camera.far = 2.5;
-  directLight.shadow.camera.top = 1;
-  directLight.shadow.camera.right = 2;
-  directLight.shadow.camera.bottom = -1;
-  directLight.shadow.camera.left = -2;
-  directLight.shadow.mapSize.width = 1024;
-  directLight.shadow.mapSize.height = 1024;
-  // const directHelper = new THREE.DirectionalLightHelper(directLight);
-  // scene.add(directHelper);
-  const directionalLightCameraHelper = new THREE.CameraHelper(directLight.shadow.camera);
-  directionalLightCameraHelper.visible = false;
-  scene.add(directionalLightCameraHelper);
+  directLight = new THREE.DirectionalLight("#fff", 0.1);
+  directLight.position.set(0, 0.5, 1);
+  const directHelper = new THREE.DirectionalLightHelper(directLight);
 
-  directLight.shadow.radius = 10;
+  const directLight2 = new THREE.DirectionalLight("#fff", 0.1);
+  directLight2.position.set(0, 0.5, -1);
+  const directHelper2 = new THREE.DirectionalLightHelper(directLight2);
+  // directLight.castShadow = true;
+  // directLight.position.set(0, 2, 0);
+  // directLight.shadow.camera.near = 1;
+  // directLight.shadow.camera.far = 2.5;
+  // directLight.shadow.camera.top = 1;
+  // directLight.shadow.camera.right = 2;
+  // directLight.shadow.camera.bottom = -1;
+  // directLight.shadow.camera.left = -2;
+  // directLight.shadow.mapSize.width = 1024;
+  // directLight.shadow.mapSize.height = 1024;
 
+  scene.add(directLight, directLight2, directHelper2);
+  // const directionalLightCameraHelper = new THREE.CameraHelper(directLight.shadow.camera);
+  // directionalLightCameraHelper.visible = false;
+  // scene.add(directionalLightCameraHelper);
+
+  // const pointLight = new THREE.PointLight(0xfff, 1);
+  // pointLight.position.y = 3;
+  // const lightHelper = new THREE.PointLightHelper(pointLight);
+  // scene.add(pointLight, lightHelper);
+
+  // directLight.shadow.radius = 10;
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.physicallyCorrectLights = true;
-  // renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
-  shadowBaked();
+  initialShadow();
   loadTableModel(listModels.rectangle.basicRectangle, material);
   loadLegModel(listLegModels.rectangle.leg1, currentLegMaterial);
 
@@ -268,14 +279,13 @@ shape.addEventListener("click", (event) => {
   if (objectShape && objectShape !== "circle") {
     material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
-    shadowBaked();
     if (objectType) {
       loadTableModel(listModels[objectShape][objectType], material);
       addBorderElement(objectType, shapeTypes, "version");
     } else {
       // load first model of shape table and legs
-      scene.remove(table);
-      scene.remove(tableLeg1, tableLeg2);
+      scene.remove(tableLeg1, tableLeg2, table);
+      currentShadow = Object.values(shadowsTextures.legs[currentShape])[0];
       loadLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
       loadTableModel(Object.values(listModels[objectShape])[0], material);
       addBorderFirsElement(currentShape, shapeTypes);
@@ -289,7 +299,6 @@ shape.addEventListener("click", (event) => {
   if (objectShape && objectShape == "circle") {
     material = ResetRepeatAndReturnMaterial();
     currentShape = objectShape;
-    shadowBaked();
     scene.remove(table);
 
     if (objectType) {
@@ -298,6 +307,7 @@ shape.addEventListener("click", (event) => {
     } else {
       // load first model of shape table and legs
       scene.remove(tableLeg1, tableLeg2);
+      currentShadow = Object.values(shadowsTextures.legs[currentShape])[0];
       loadTableModel(Object.values(listModels[currentShape])[0], material);
       loadCircleLegModel(Object.values(listLegModels[currentShape])[0], currentLegMaterial);
       addBorderFirsElement(currentShape, shapeTypes);
@@ -306,6 +316,8 @@ shape.addEventListener("click", (event) => {
     addBorderElement(objectShape, shapeButtons, "shape");
     addBorderFirsElement(currentShape, legButtons);
   }
+
+  updateShadows();
 });
 
 function ResetUIConfigurator() {
@@ -356,9 +368,10 @@ typeLeg.addEventListener("click", (event) => {
   const data = event.target.dataset.leg;
   if (data) {
     currentLegType = data;
+    currentShadow = shadowsTextures.legs[currentShape][data];
     loadLegModel(listLegModels[currentShape][data], currentLegMaterial);
-    shadowBaked();
     addBorderElement(data, legButtons, "leg");
+    updateShadows();
   }
 });
 
@@ -464,19 +477,75 @@ function AddShadowFloor() {
   scene.add(mesh);
 }
 
-function shadowBaked() {
+function updateShadows() {
+  if (currentShape) {
+    gltfLoader.load(shadowSquare, function (glb) {
+      scene.remove(shadow);
+      shadow = glb.scene;
+      const texture = shadowsTextures.table[currentShape];
+      texture.flipY = false;
+      const shadowMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+      });
+      shadow.traverse((child) => {
+        child.material = shadowMaterial;
+      });
+      shadow.scale.x = currentScale.x;
+      shadow.scale.z = currentScale.z;
+      scene.add(shadow);
+    });
+
+    if (currentShape !== "circle") {
+      gltfLoader.load(shadowSmallRectangle, function (glb) {
+        scene.remove(shadowLegs1, shadowLegs2);
+        shadowLegs1 = glb.scene;
+        const shadowTextureLegs = currentShadow;
+        shadowTextureLegs.encoding = THREE.sRGBEncoding;
+        const shadowMaterialLegs = new THREE.MeshBasicMaterial({
+          color: "#000",
+          transparent: true,
+          opacity: 1,
+          alphaMap: shadowTextureLegs,
+        });
+        shadowLegs1.children[0].material = shadowMaterialLegs;
+        shadowLegs1.position.x = 0.75 * currentScale.x - 0.15;
+        shadowLegs1.position.y = 0.005;
+
+        shadowLegs2 = shadowLegs1.clone();
+        shadowLegs2.rotateY(Math.PI);
+        shadowLegs2.position.x = -0.75 * currentScale.x + 0.15;
+        shadowLegs2.position.y = 0.005;
+        scene.add(shadowLegs1, shadowLegs2);
+      });
+    } else {
+      gltfLoader.load(shadowSquare, function (glb) {
+        scene.remove(shadowLegs1, shadowLegs2);
+        shadowLegs1 = glb.scene;
+        const shadowTextureLegs = currentShadow;
+        shadowTextureLegs.encoding = THREE.sRGBEncoding;
+        const shadowMaterialLegs = new THREE.MeshBasicMaterial({
+          color: "#000",
+          transparent: true,
+          opacity: 1,
+          alphaMap: shadowTextureLegs,
+        });
+        shadowLegs1.children[0].material = shadowMaterialLegs;
+        scene.add(shadowLegs1);
+      });
+    }
+  }
+}
+
+function initialShadow() {
   //shadow V2
-  gltfLoader.load(shadowFloor, function (glb) {
+  gltfLoader.load(shadowSquare, function (glb) {
     scene.remove(shadow);
     shadow = glb.scene;
     const shadowTextureShape = shadowsTextures.table[currentShape];
     shadowTextureShape.flipY = false;
-    shadowTextureShape.encoding = THREE.sRGBEncoding;
+    // shadowTextureShape.encoding = THREE.sRGBEncoding;
     const shadowMaterial = new THREE.MeshBasicMaterial({
-      color: "#000",
-      transparent: true,
-      opacity: 1,
-      alphaMap: shadowTextureShape,
+      map: shadowTextureShape,
     });
     shadow.traverse((child) => {
       child.material = shadowMaterial;
@@ -485,6 +554,49 @@ function shadowBaked() {
     shadow.scale.z = currentScale.z;
     // shadow.scale.set(shadowRescale.x, 1, shadowRescale.z);
     scene.add(shadow);
+
+    // if (currentShape === "circle") {
+    //   scene.remove(shadowLegs1, shadowLegs2);
+    //   shadowLegs1 = shadow.clone();
+    //   const textureLeg = shadowsTextures.legs[currentShape][currentShadow];
+    //   console.log(textureLeg);
+    //   console.log(currentShadow);
+    //   textureLeg.flipY = false;
+    //   textureLeg.encoding = THREE.sRGBEncoding;
+    //   const shadowMaterial = new THREE.MeshBasicMaterial({
+    //     color: "#000",
+    //     transparent: true,
+    //     opacity: 1,
+    //     alphaMap: textureLeg,
+    //   });
+    //   shadowLegs1.traverse((child) => {
+    //     child.material = shadowMaterial;
+    //   });
+    //   // shadowLegs1.material.alphaMap = textureLeg;
+    //   scene.add(shadowLegs1);
+    // }
+  });
+
+  gltfLoader.load(shadowSmallRectangle, function (glb) {
+    scene.remove(shadowLegs1, shadowLegs2);
+    shadowLegs1 = glb.scene;
+    const shadowTextureLegs = shadowsTextures.legs[currentShape][currentLegType];
+    shadowTextureLegs.encoding = THREE.sRGBEncoding;
+    const shadowMaterialLegs = new THREE.MeshBasicMaterial({
+      color: "#000",
+      transparent: true,
+      opacity: 1,
+      alphaMap: shadowTextureLegs,
+    });
+    shadowLegs1.children[0].material = shadowMaterialLegs;
+    shadowLegs1.position.x = 0.75 * currentScale.x - 0.15;
+    shadowLegs1.position.y = 0.001;
+
+    shadowLegs2 = shadowLegs1.clone();
+    shadowLegs2.rotateY(Math.PI);
+    shadowLegs2.position.x = -0.75 * currentScale.x + 0.15;
+    shadowLegs2.position.y = 0.001;
+    scene.add(shadowLegs1, shadowLegs2);
   });
 
   // if (currentShape === "circle") {
