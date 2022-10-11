@@ -146,7 +146,7 @@ export const wood3 = {
 
 export const wood4 = {
   map: tableColorTextureWood4,
-  roughnessMap: tableRoughnessTextureWood4,
+  roughnessMap: tableRoughnessTextureWood2,
   roughness: 1,
   normalMap: tableNormalTextureWood4,
 };

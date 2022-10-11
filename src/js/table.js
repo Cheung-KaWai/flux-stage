@@ -31,25 +31,3 @@ export const allTextures = {
   metal,
   metal2,
 };
-
-// export function createTable(shape, material) {
-//   const shapeObject = {
-//     circle: new THREE.CylinderGeometry(1, 1, 1, 64, 64),
-//     rect: new THREE.BoxGeometry(1, 1, 1),
-//     // oval: new THREE.CylinderGeometry(1, 1, 1, 64, 32),
-//   };
-
-//   // sizes in meters
-//   const scale = {
-//     rect: [1.5, 0.025, 0.6],
-//     circle: [0.5, 0.025, 0.5],
-//     // oval: [0.75, 0.05, 0.3],
-//   };
-
-//   const geometry = shapeObject[shape];
-//   const table = new THREE.Mesh(geometry, material);
-//   table.castShadow = true;
-//   table.receiveShadow = false;
-//   table.scale.set(...scale[shape]);
-//   return table;
-// }

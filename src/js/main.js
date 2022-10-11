@@ -1,23 +1,20 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls";
+import { GLTFExporter } from "/node_modules/three/examples/jsm/exporters/GLTFExporter.js";
 import { allTextures, listModels } from "./table";
 import { listLegModels, legsMaterial, positionLeg } from "./legs";
-import { Pane } from "tweakpane";
 import { loadingManager, transformTextureOnResize, shadowsTextures } from "./loadTextures";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
+import shadowSquare from "../models/shadowSquare.glb?url";
+import shadowSmallRectangle from "../models/shadowSmallRectangle.glb?url";
+
 const dracoLoader = new DRACOLoader(loadingManager);
 dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.4.3/");
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
-
-import vertexShader from "./../shaders/vertexShader.glsl?raw";
-import fragmentShader from "./../shaders/fragmentShader.glsl?raw";
-
-import shadowSquare from "../models/shadowSquare.glb?url";
-import shadowSmallRectangle from "../models/shadowSmallRectangle.glb?url";
 
 let dimensions = {
   width: window.innerWidth * 0.74,
@@ -60,8 +57,8 @@ let rescale = {
     z: 60,
   },
 };
-// const shadowRescale = { x: 0.7, z: 0.5 };
 let shadow;
+let exporter = new GLTFExporter();
 
 const inputFields = Array.from(document.querySelectorAll(".configuration-size-inputField"));
 const shapeTypes = Array.from(document.querySelectorAll(".shape-type"));
@@ -85,43 +82,16 @@ function init() {
   camera.position.set(1, 0.3, 2);
 
   controls = new OrbitControls(camera, canvas);
-  // controls.enablePan = false;
-  // controls.minDistance = 1.0;
-  // controls.maxDistance = 3.0;
-  // controls.maxPolarAngle = Math.PI * 0.6;
   controls.enableDamping = true;
 
   ambientLight = new THREE.AmbientLight("#fff", 3); // 3.1
 
   directLight = new THREE.DirectionalLight("#fff", 0.1);
   directLight.position.set(0, 0.5, 1);
-  const directHelper = new THREE.DirectionalLightHelper(directLight);
 
   const directLight2 = new THREE.DirectionalLight("#fff", 0.1);
   directLight2.position.set(0, 0.5, -1);
-  const directHelper2 = new THREE.DirectionalLightHelper(directLight2);
-  // directLight.castShadow = true;
-  // directLight.position.set(0, 2, 0);
-  // directLight.shadow.camera.near = 1;
-  // directLight.shadow.camera.far = 2.5;
-  // directLight.shadow.camera.top = 1;
-  // directLight.shadow.camera.right = 2;
-  // directLight.shadow.camera.bottom = -1;
-  // directLight.shadow.camera.left = -2;
-  // directLight.shadow.mapSize.width = 1024;
-  // directLight.shadow.mapSize.height = 1024;
 
-  scene.add(directLight, directLight2, directHelper2);
-  // const directionalLightCameraHelper = new THREE.CameraHelper(directLight.shadow.camera);
-  // directionalLightCameraHelper.visible = false;
-  // scene.add(directionalLightCameraHelper);
-
-  // const pointLight = new THREE.PointLight(0xfff, 1);
-  // pointLight.position.y = 3;
-  // const lightHelper = new THREE.PointLightHelper(pointLight);
-  // scene.add(pointLight, lightHelper);
-
-  // directLight.shadow.radius = 10;
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(dimensions.width, dimensions.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -136,12 +106,8 @@ function init() {
   loadTableModel(listModels.rectangle.basicRectangle, material);
   loadLegModel(listLegModels.rectangle.leg1, currentLegMaterial);
 
-  //floor for shadow
-  // addFloor();
-  // AddShadowFloor();
-
   window.addEventListener("resize", onWindowResize);
-  scene.add(camera, ambientLight, directLight);
+  scene.add(camera, ambientLight, directLight, directLight2);
   animate();
 }
 
@@ -172,18 +138,6 @@ function animate() {
   renderer.render(scene, camera);
   controls.update();
   window.requestAnimationFrame(animate);
-}
-
-function addFloor() {
-  floor = new THREE.Mesh(
-    new THREE.CircleGeometry(20, 32),
-    new THREE.MeshStandardMaterial({ color: "#fff", roughness: 0.7 })
-  );
-  floor.receiveShadow = true;
-  floor.position.set(0, -0.41, 0);
-  floor.rotateX(-Math.PI * 0.5);
-
-  scene.add(floor);
 }
 
 function loadTableModel(model, material) {
@@ -249,8 +203,6 @@ size.addEventListener("change", (event) => {
     const factor = size / rescale.rectangle[orientation];
     table.scale[orientation] = factor;
     shadow.scale[orientation] = factor;
-
-    // === 1 ? factor : factor * shadowRescale[orientation]
 
     // fix repeat texture when resizing
     currentScale[orientation] = factor;
@@ -464,19 +416,6 @@ function ResetRepeatAndReturnMaterial() {
   return new THREE.MeshStandardMaterial(Object.fromEntries(arrayValues));
 }
 
-function AddShadowFloor() {
-  const material = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    side: THREE.DoubleSide,
-  });
-  const geometry = new THREE.PlaneGeometry(1.5, 1.5, 32, 32);
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.rotateX(Math.PI * 0.5);
-  mesh.position.y = -0.41;
-  scene.add(mesh);
-}
-
 function updateShadows() {
   if (currentShape) {
     gltfLoader.load(shadowSquare, function (glb) {
@@ -537,13 +476,11 @@ function updateShadows() {
 }
 
 function initialShadow() {
-  //shadow V2
   gltfLoader.load(shadowSquare, function (glb) {
     scene.remove(shadow);
     shadow = glb.scene;
     const shadowTextureShape = shadowsTextures.table[currentShape];
     shadowTextureShape.flipY = false;
-    // shadowTextureShape.encoding = THREE.sRGBEncoding;
     const shadowMaterial = new THREE.MeshBasicMaterial({
       map: shadowTextureShape,
     });
@@ -552,29 +489,7 @@ function initialShadow() {
     });
     shadow.scale.x = currentScale.x;
     shadow.scale.z = currentScale.z;
-    // shadow.scale.set(shadowRescale.x, 1, shadowRescale.z);
     scene.add(shadow);
-
-    // if (currentShape === "circle") {
-    //   scene.remove(shadowLegs1, shadowLegs2);
-    //   shadowLegs1 = shadow.clone();
-    //   const textureLeg = shadowsTextures.legs[currentShape][currentShadow];
-    //   console.log(textureLeg);
-    //   console.log(currentShadow);
-    //   textureLeg.flipY = false;
-    //   textureLeg.encoding = THREE.sRGBEncoding;
-    //   const shadowMaterial = new THREE.MeshBasicMaterial({
-    //     color: "#000",
-    //     transparent: true,
-    //     opacity: 1,
-    //     alphaMap: textureLeg,
-    //   });
-    //   shadowLegs1.traverse((child) => {
-    //     child.material = shadowMaterial;
-    //   });
-    //   // shadowLegs1.material.alphaMap = textureLeg;
-    //   scene.add(shadowLegs1);
-    // }
   });
 
   gltfLoader.load(shadowSmallRectangle, function (glb) {
@@ -598,105 +513,32 @@ function initialShadow() {
     shadowLegs2.position.y = 0.001;
     scene.add(shadowLegs1, shadowLegs2);
   });
-
-  // if (currentShape === "circle") {
-  //   gltfLoader.load(shadowFloor, function (glb) {
-  //     scene.remove(shadowLegs1, shadowLegs2);
-  //     shadowLegs1 = glb.scene;
-
-  //     const shadowTextureLegs = shadowsTextures.legs[currentShape][currentLegType];
-
-  //     shadowTextureLegs.flipY = false;
-  //     shadowTextureLegs.encoding = THREE.sRGBEncoding;
-  //     const shadowMaterialLegs = new THREE.MeshBasicMaterial({
-  //       color: "#000",
-  //       transparent: true,
-  //       opacity: 0.8,
-  //       alphaMap: shadowTextureLegs,
-  //     });
-  //     shadowLegs1.children[0].material = shadowMaterialLegs;
-  //     shadowLegs1.position.y = 0.001;
-  //     scene.add(shadowLegs1);
-  //   });
-  // } else {
-  //   gltfLoader.load(shadowFloorLegs, function (glb) {
-  //     scene.remove(shadowLegs1, shadowLegs2);
-  //     shadowLegs1 = glb.scene;
-
-  //     const shadowTextureLegs = shadowsTextures.legs[currentShape][currentLegType];
-
-  //     shadowTextureLegs.flipY = false;
-  //     shadowTextureLegs.encoding = THREE.sRGBEncoding;
-  //     const shadowMaterialLegs = new THREE.MeshBasicMaterial({
-  //       color: "#000",
-  //       transparent: true,
-  //       opacity: 0.8,
-  //       alphaMap: shadowTextureLegs,
-  //     });
-  //     shadowLegs1.children[0].material = shadowMaterialLegs;
-  //     shadowLegs1.position.y = 0.001;
-  //     shadowLegs1.position.x = 0.75 * currentScale.x - 0.15;
-
-  //     shadowLegs2 = shadowLegs1.clone();
-  //     shadowLegs2.rotateY(Math.PI);
-  //     shadowLegs2.position.y = 0.001;
-  //     shadowLegs2.position.x = -0.75 * currentScale.x + 0.15;
-  //     scene.add(shadowLegs1, shadowLegs2);
-  //   });
-  // }
 }
-
 init();
 
-////////////////////////////////// DEBUG ///////////////////////////////////////////
-// tweak parameters
-// debug = new Pane({ container: document.querySelector(".debug") });
+//////////////////////////////Export models////////////////////////
+const exportButton = document.querySelector("#export");
+exportButton.addEventListener("click", () => {
+  exporter.parse(
+    [table, tableLeg1, tableLeg2],
+    (glb) => {
+      console.log(glb);
+      saveArrayBuffer(glb, "test.glb");
+    },
+    (err) => {
+      console.log(err);
+    },
+    { binary: true }
+  );
+});
 
-// const checkDebug = debug.addFolder({
-//   title: "check",
-//   expanded: false,
-// });
+function saveArrayBuffer(buffer, filename) {
+  save(new Blob([buffer], { type: "application/octet-stream" }), filename);
+}
 
-// checkDebug.addInput(allTextures.check.map.repeat, "y", { min: 0, max: 3, step: 0.01 }).on("change", (ev) => {
-//   allTextures.check.map.repeat.y = ev.value;
-// });
-// checkDebug.addInput(allTextures.check.map.repeat, "x", { min: 0, max: 3, step: 0.01 }).on("change", (ev) => {
-//   allTextures.check.map.repeat.x = ev.value;
-// });
-
-// const tableDebug = debug.addFolder({
-//   title: "table",
-//   expanded: false,
-// });
-// tableDebug
-//   .addInput(material, "roughness", { min: 0, max: 1, step: 0.1 })
-//   .on("change", (ev) => (material.roughness = ev.value));
-
-// tableDebug
-//   .addInput(material, "metalness", { min: 0, max: 1, step: 0.1 })
-//   .on("change", (ev) => (material.metalness = ev.value));
-
-// const legsDebug = debug.addFolder({
-//   title: "legs",
-//   expanded: false,
-// });
-
-// legsDebug
-//   .addInput(tableLeg1.children[0].material, "metalness", {
-//     min: 0,
-//     max: 1,
-//     step: 0.1,
-//   })
-//   .on("change", (ev) => {
-//     tableLegs.children.map((leg) => (leg.material.metalness = ev.value));
-//   });
-
-// legsDebug
-//   .addInput(tableLegs.children[0].material, "roughness", {
-//     min: 0,
-//     max: 1,
-//     step: 0.1,
-//   })
-//   .on("change", (ev) => {
-//     tableLegs.children.map((leg) => (leg.material.roughness = ev.value));
-//   });
+function save(blob, filename) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
