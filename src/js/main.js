@@ -40,12 +40,12 @@ let currentLegMaterial = new THREE.MeshStandardMaterial(allTextures.metal);
 let currentTexture = allTextures.wood4;
 let currentScale = { x: 1, y: 1, z: 1 };
 let currentLegType = "leg1";
-let currentShadow = "leg1";
+let currentShadow = shadowsTextures.legs.rectangle.leg1;
 let rescale = {
   rectangle: {
     x: 150,
     y: 5,
-    z: 60,
+    z: 80,
   },
   circle: {
     x: 150,
@@ -54,7 +54,7 @@ let rescale = {
   outdoor: {
     x: 150,
     y: 5,
-    z: 60,
+    z: 80,
   },
 };
 let shadow;
@@ -64,7 +64,7 @@ const inputFields = Array.from(document.querySelectorAll(".configuration-size-in
 const shapeTypes = Array.from(document.querySelectorAll(".shape-type"));
 const legTypes = Array.from(document.querySelectorAll(".leg"));
 const toggle = document.querySelector("#arrow");
-const resetValues = [150, 60, 150, 5];
+const resetValues = [150, 80, 150, 5];
 
 const shapeButtons = Array.from(document.querySelectorAll(".shape"));
 const legButtons = Array.from(document.querySelectorAll(".leg"));
@@ -79,7 +79,7 @@ function init() {
   scene.background = new THREE.Color("#fff");
 
   camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.001, 1000);
-  camera.position.set(1, 0.3, 2);
+  camera.position.set(1.8, 1.5, 3);
 
   controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -102,6 +102,7 @@ function init() {
 
   // basic table
   material = new THREE.MeshStandardMaterial(allTextures.wood4);
+  // material.wireframe = true;
   initialShadow();
   loadTableModel(listModels.rectangle.basicRectangle, material);
   loadLegModel(listLegModels.rectangle.leg1, currentLegMaterial);
@@ -516,13 +517,18 @@ function initialShadow() {
 }
 init();
 
+const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeMaterial = new THREE.MeshStandardMaterial({ color: "#f00" });
+const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+cube.position.set(0, 0, -2);
+scene.add(cube);
+
 //////////////////////////////Export models////////////////////////
 const exportButton = document.querySelector("#export");
 exportButton.addEventListener("click", () => {
   exporter.parse(
     [table, tableLeg1, tableLeg2],
     (glb) => {
-      console.log(glb);
       saveArrayBuffer(glb, "test.glb");
     },
     (err) => {

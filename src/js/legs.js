@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { metal } from "./loadTextures";
 
-import leg1 from "../models/legs/rectangle/leg1.glb?url";
+import leg1 from "../models/legs/rectangle/legSize.glb?url";
 import leg2 from "../models/legs/rectangle/leg2.glb?url";
 import leg3 from "../models/legs/circle/leg3.glb?url";
 

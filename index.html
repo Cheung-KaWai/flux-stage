@@ -30,10 +30,6 @@
             />
             <img src="/src/assets/configurator/shape/circle.jpg" alt="circle" data-shape="circle" class="shape" />
             <img src="/src/assets/configurator/shape/outdoor.jpg" alt="outdoor" data-shape="outdoor" class="shape" />
-
-            <!-- <button data-shape="rectangle" class="underline shape">Rectangle</button>
-            <button data-shape="circle" class="shape">Circle</button>
-            <button data-shape="outdoor" class="shape">Outdoor</button> -->
           </div>
           <p class="label">Edges finish</p>
           <div>
@@ -65,11 +61,6 @@
               data-version="outdoorBasic"
               class="shape-type border hide"
             />
-
-            <!-- <button data-shape="rectangle" data-version="basicRectangle" class="underline shape-type">Sharp</button>
-            <button data-shape="rectangle" data-version="roundedRectangle" class="shape-type">Rounded</button>
-            <button data-shape="circle" data-version="basicCircle" class="underline shape-type hide">Sharp</button>
-            <button data-shape="circle" data-version="roundedCircle" class="underline shape-type hide">rounded</button> -->
           </div>
         </div>
       </div>
@@ -89,9 +80,8 @@
         <div class="configuration-size-inputField" data-type="rectangle oval outdoor">
           <label for="width">Width</label>
           <select name="width" id="width-input" data-orientation="z" class="select">
-            <option value="60">60 cm</option>
-            <option value="70">70 cm</option>
             <option value="80">80 cm</option>
+            <option value="90">90 cm</option>
           </select>
         </div>
 
@@ -103,14 +93,6 @@
             <option value="170">170 cm</option>
           </select>
         </div>
-
-        <!-- <div class="configuration-size-inputField" data-type="rectangle circle oval">
-          <label for="Height">Height</label>
-          <select name="height" id="height-input" data-orientation="y" class="select">
-            <option value="5">5 cm</option>
-            <option value="6">6 cm</option>
-          </select>
-        </div> -->
       </div>
 
       <div class="configuration-texture">
@@ -167,10 +149,6 @@
               data-type="circle"
               data-shape="circle"
             />
-            <!-- <button data-leg="leg1" class="underline leg" data-type="rectangle">T-Legs</button>
-            <button data-leg="leg2" class="leg" data-type="rectangle">X-legs</button>
-            <button data-leg="leg3" class="underline leg hide" data-type="circle">Cilinder</button>
-            <button data-leg="leg4" class="leg hide" data-type="circle">Cone</button> -->
           </div>
         </div>
       </div>
@@ -178,31 +156,9 @@
       <div class="configuration-texture-legs">
         <h2 class="mb-1"><span class="step">5</span> | Texture Legs</h2>
         <div>
-          <!-- <div class="texture-container-leg border" data-texture="metal"> -->
           <img src="/src/assets/legs/Metal009_PREVIEW.jpg" data-texture="metal" class="texture-leg border" />
-          <!-- <p>metal</p> -->
-          <!-- </div> -->
-          <!-- <div class="texture-container-leg" data-texture="metal2"> -->
           <img src="/src/assets/legs/leg2/Metal012_PREVIEW.jpg" data-texture="metal2" class="texture-leg" />
-          <!-- <p>metal</p> -->
-          <!-- </div> -->
         </div>
-        <!-- <div class="texture-container-leg">
-          <img src="/src/assets/table/wood4/Wood066_1K_Color.jpg" data-texture="wood4" class="texture" />
-          <p>wood1</p>
-        </div>
-        <div class="texture-container-leg">
-          <img src="/src/assets/table/wood3/Wood073_1K_Color.jpg" data-texture="wood3" class="texture" />
-          <p>wood2</p>
-        </div>
-        <div class="texture-container-leg">
-          <img src="/src/assets/table/wood2/Wood051_1K_Color.jpg" data-texture="wood2" class="texture" />
-          <p>wood3</p>
-        </div>
-        <div class="texture-container-leg">
-          <img src="/src/assets/table/wood1/Wood_023_basecolor.jpg" data-texture="wood1" class="texture" />
-          <p>wood4</p>
-        </div> -->
       </div>
       <button id="export">Export configuration</button>
     </div>

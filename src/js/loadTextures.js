@@ -58,7 +58,7 @@ export const metal = {
   metalnessMap: metallicMap,
   metalness: 1,
   envMap: environmentMapTexture,
-  envMapIntensity: 0.8,
+  envMapIntensity: 0.3,
   normalMap: normalMap,
   roughnessMap: metalRoughness,
 };
@@ -69,18 +69,20 @@ export const metal2 = {
   metalnessMap: metallicMap2,
   metalness: 1,
   envMap: environmentMapTexture,
-  envMapIntensity: 0.8,
+  envMapIntensity: 0.3,
   normalMap: normalMap2,
   roughnessMap: metalRoughness2,
 };
 
 const tableColorTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Color.jpg");
-const tableRoughnessTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Roughness.jpg");
-const tableNormalTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_NormalDx.jpg");
-const tableDisplacementTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Displacement.jpg");
+const tableRoughnessTextureWood4 = textureLoader.load("/src/assets/table/wood4/test_smoothness.jpg");
+// const tableRoughnessTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_Roughness.jpg");
+// const tableNormalTextureWood4 = textureLoader.load("/src/assets/table/wood4/normal4.jpg");
+const tableNormalTextureWood4 = textureLoader.load("/src/assets/table/wood4/Wood066_1K_NormalDX.jpg");
 
 const tableColorTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Color.jpg");
-const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Roughness.jpg");
+// const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_Roughness.jpg");
+const tableRoughnessTextureWood3 = textureLoader.load("/src/assets/table/wood3/roughness3.jpg");
 const tableNormalTextureWood3 = textureLoader.load("/src/assets/table/wood3/Wood030_1K_NormalDx.jpg");
 
 const tableColorTextureWood1 = textureLoader.load("/src/assets/table/wood1/Wood_023_basecolor.jpg");
@@ -96,8 +98,8 @@ export const checkTexture = textureLoader.load("/src/assets/image.png");
 
 const shadowTableRect = textureLoader.load("/src/assets/shadows/tableShadow3.jpg");
 const shadowTableCircle = textureLoader.load("/src/assets/shadows/circleShadow.jpg");
-const shadowTextureLeg1 = textureLoader.load("/src/assets/shadows/shadowLegs1V3.jpg");
-const shadowTextureLeg2 = textureLoader.load("/src/assets/shadows/shadowLegs2V2.jpg");
+const shadowTextureLeg1 = textureLoader.load("/src/assets/shadows/shadowLeg1V4.jpg");
+const shadowTextureLeg2 = textureLoader.load("/src/assets/shadows/shadowLeg2V4.jpg");
 const shadowTextureLeg3 = textureLoader.load("/src/assets/shadows/shadowLegs3V2.jpg");
 
 export const shadowsTextures = {
@@ -140,14 +142,14 @@ export const wood2 = {
 export const wood3 = {
   map: tableColorTextureWood3,
   roughnessMap: tableRoughnessTextureWood3,
-  roughness: 1,
+  roughness: 0.6,
   normalMap: tableNormalTextureWood3,
 };
 
 export const wood4 = {
   map: tableColorTextureWood4,
-  roughnessMap: tableRoughnessTextureWood2,
-  roughness: 1,
+  roughnessMap: tableRoughnessTextureWood4,
+  roughness: 0.6,
   normalMap: tableNormalTextureWood4,
 };
 

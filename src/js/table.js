@@ -1,4 +1,4 @@
-import basicRectangle from "../models/tables/rectangle/basic.glb?url";
+import basicRectangle from "../models/tables/rectangle/tableSize.glb?url";
 import roundedRectangle from "../models/tables/rectangle/rounded.glb?url";
 import outdoorBasic from "../models/tables/outdoor/outdoor2.glb?url";
 import basicCircle from "../models/tables/circle/circleBasic.glb?url";
