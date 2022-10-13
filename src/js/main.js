@@ -10,6 +10,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 import shadowSquare from "../models/shadowSquare.glb?url";
 import shadowSmallRectangle from "../models/shadowSmallRectangle.glb?url";
+import { getData } from "./firebase";
 
 const dracoLoader = new DRACOLoader(loadingManager);
 dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.4.3/");
@@ -517,11 +518,11 @@ function initialShadow() {
 }
 init();
 
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-const cubeMaterial = new THREE.MeshStandardMaterial({ color: "#f00" });
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-cube.position.set(0, 0, -2);
-scene.add(cube);
+// const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+// const cubeMaterial = new THREE.MeshStandardMaterial({ color: "#f00" });
+// const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+// cube.position.set(0, 0, -2);
+// scene.add(cube);
 
 //////////////////////////////Export models////////////////////////
 const exportButton = document.querySelector("#export");
@@ -547,4 +548,28 @@ function save(blob, filename) {
   link.href = URL.createObjectURL(blob);
   link.download = filename;
   link.click();
+}
+
+////////// GENERATE ROOM
+const generate = document.querySelector("#generate");
+const roomId = document.querySelector("#roomId");
+generate.addEventListener("click", async () => {
+  const data = await getData(roomId.value);
+  generateWalls(data);
+});
+
+function generateWalls(data) {
+  data.muren.map((wall) => {
+    const muur = new THREE.Mesh(
+      new THREE.BoxGeometry(wall.dimensions[0], wall.dimensions[1], 0.02),
+      new THREE.MeshStandardMaterial({ color: "#00f", side: THREE.DoubleSide })
+    );
+
+    const matrix = new THREE.Matrix4();
+    let values = wall.transform;
+    values[13] = 0.5;
+    matrix.set(...values);
+    muur.applyMatrix4(matrix.transpose());
+    scene.add(muur);
+  });
 }
